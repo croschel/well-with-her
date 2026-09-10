@@ -67,6 +67,13 @@ CLI; `revalidateTag` now **requires** a `cacheLife` profile as a second argument
 opt-in `cacheComponents` flag; and `next/image` defaults changed (`qualities` defaults to `[75]`,
 `minimumCacheTTL` to 4h, `images.domains` is deprecated in favour of `remotePatterns`).
 
+**Discovered in Ticket 0, not in the original brief:** the ambient `LayoutProps<"/">` /
+`PageProps<"/...">` types Next 16 generates for route files only exist after `next dev` or
+`next build` has run — `tsc --noEmit` alone fails on a clean checkout with `Cannot find name
+'LayoutProps'`. Fix: `npm run typecheck` runs `next typegen` (a types-only, no-build command)
+before `tsc --noEmit`. This matters for CI (§8): the `typecheck` step works standalone because the
+fix lives in the script, not because build ran first — no CI ordering change was needed.
+
 ---
 
 ## 2. Open decisions requiring approval
