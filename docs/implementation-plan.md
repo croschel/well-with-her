@@ -74,6 +74,16 @@ opt-in `cacheComponents` flag; and `next/image` defaults changed (`qualities` de
 before `tsc --noEmit`. This matters for CI (§8): the `typecheck` step works standalone because the
 fix lives in the script, not because build ran first — no CI ordering change was needed.
 
+**Discovered in Ticket 1:**
+- Vitest's coverage `exclude` globs are matched literally — unescaped parentheses in a path segment
+  (`src/app/(payload)/**`) silently match nothing instead of erroring, so the whole route group
+  leaked into the coverage report. Fix: escape them (`src/app/\\(payload\\)/**`). Worth remembering
+  for any future excluded path under a route group in parens (e.g. `(site)`).
+- `payload run <script>` resolves as soon as the dynamic `import()` of the script file settles, not
+  when the script's async work finishes. A fire-and-forget `run().catch(...)` at the bottom of a
+  script lets the CLI call `process.exit(0)` before anything inside `run()` actually executes —
+  silently, with zero output. Fix: a real top-level `await run()` inside try/catch.
+
 ---
 
 ## 2. Open decisions requiring approval
