@@ -5,6 +5,7 @@ import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
+import sharp from "sharp";
 
 import { Articles } from "@/collections/Articles";
 import { Media } from "@/collections/Media";
@@ -21,6 +22,7 @@ export default buildConfig({
   globals: [SiteInfo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET ?? "",
+  sharp,
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
