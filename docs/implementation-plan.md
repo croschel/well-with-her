@@ -74,6 +74,26 @@ opt-in `cacheComponents` flag; and `next/image` defaults changed (`qualities` de
 before `tsc --noEmit`. This matters for CI (§8): the `typecheck` step works standalone because the
 fix lives in the script, not because build ran first — no CI ordering change was needed.
 
+**Discovered in Ticket 1:**
+- Vitest's coverage `exclude` globs are matched literally — unescaped parentheses in a path segment
+  (`src/app/(payload)/**`) silently match nothing instead of erroring, so the whole route group
+  leaked into the coverage report. Fix: escape them (`src/app/\\(payload\\)/**`). Worth remembering
+  for any future excluded path under a route group in parens (e.g. `(site)`).
+- `payload run <script>` resolves as soon as the dynamic `import()` of the script file settles, not
+  when the script's async work finishes. A fire-and-forget `run().catch(...)` at the bottom of a
+  script lets the CLI call `process.exit(0)` before anything inside `run()` actually executes —
+  silently, with zero output. Fix: a real top-level `await run()` inside try/catch.
+- `sharp` being installed isn't enough — Payload also needs it passed explicitly into
+  `buildConfig({ sharp })`, or image resizing (Media's `imageSizes`) silently no-ops with just a
+  console warning, not an error. Only caught this by actually booting the admin panel.
+
+**Ticket 1 live-database verification — done 2026-09-11.** Blocker resolved: connected to a real
+Neon project (`plain-flower-68266193`, `production` branch) via `neon link` (see the Neon CLI setup
+commit). With a real `DATABASE_URI`: `/admin` boots and shows Payload's "Create first user" screen,
+the schema push succeeds against live Postgres, and `npm run seed` created the SiteInfo global + 3
+sample articles — verified directly via `neon psql`. Remaining manual step for Caique: open `/admin`
+and create the real first user (email/password are his to choose, not something to seed).
+
 ---
 
 ## 2. Open decisions requiring approval
