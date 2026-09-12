@@ -38,6 +38,8 @@ const SAMPLE_ARTICLES = [
     pinId: "pin001",
     slug: "five-minute-morning-reset",
     title: "The Five-Minute Morning Reset",
+    ogDescription:
+      "A tiny five-minute ritual that sets a calmer tone for the whole day.",
     buyButtonUrl: "https://example.com/shop/morning-reset-kit",
     publishedAt: new Date().toISOString(),
   },
@@ -46,6 +48,8 @@ const SAMPLE_ARTICLES = [
     pinId: "pin002",
     slug: "wind-down-routine-for-better-sleep",
     title: "A Wind-Down Routine for Better Sleep",
+    ogDescription:
+      "A simple evening sequence that signals to your body it's time to rest.",
     buyButtonUrl: "https://example.com/shop/sleep-kit",
     publishedAt: new Date().toISOString(),
   },
@@ -54,23 +58,51 @@ const SAMPLE_ARTICLES = [
     pinId: "pin003",
     slug: "simple-anti-inflammatory-breakfast",
     title: "A Simple Anti-Inflammatory Breakfast",
+    ogDescription:
+      "An easy, real-food breakfast that's gentle on inflammation and quick to make.",
     buyButtonUrl: "https://example.com/shop/breakfast-kit",
     publishedAt: new Date().toISOString(),
   },
 ];
 
+const findOrUploadMedia = async (
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  alt: string,
+  fileName: string,
+) => {
+  const existing = await payload.find({
+    collection: "media",
+    where: { alt: { equals: alt } },
+    limit: 1,
+  });
+  if (existing.docs[0]) return existing.docs[0];
+
+  return payload.create({
+    collection: "media",
+    data: { alt },
+    filePath: `${import.meta.dirname}/seed-assets/${fileName}`,
+  });
+};
+
 const run = async () => {
   const payload = await getPayload({ config });
 
-  const placeholderImage = await payload.create({
-    collection: "media",
-    data: { alt: "Placeholder seed image" },
-    filePath: `${import.meta.dirname}/seed-assets/placeholder.png`,
-  });
+  const placeholderImage = await findOrUploadMedia(
+    payload,
+    "Placeholder seed image",
+    "placeholder.png",
+  );
+
+  const heroImage = await findOrUploadMedia(
+    payload,
+    "A woman relaxing in cream loungewear by a sunlit window — placeholder from the design reference, replace with licensed photography before launch.",
+    "home-hero-placeholder.png",
+  );
 
   await payload.updateGlobal({
     slug: "site-info",
     data: {
+      homeHeroImage: heroImage.id,
       asideContent: richText(
         "About WellWithHer — seed placeholder copy, replace in the admin.",
       ),
@@ -79,7 +111,15 @@ const run = async () => {
     },
   });
 
+  let created = 0;
   for (const article of SAMPLE_ARTICLES) {
+    const existing = await payload.find({
+      collection: "articles",
+      where: { pinId: { equals: article.pinId } },
+      limit: 1,
+    });
+    if (existing.docs[0]) continue;
+
     await payload.create({
       collection: "articles",
       data: {
@@ -90,9 +130,10 @@ const run = async () => {
         ),
       },
     });
+    created += 1;
   }
 
-  console.log(`Seeded ${SAMPLE_ARTICLES.length} articles and the SiteInfo global.`);
+  console.log(`Seeded ${created} new article(s) and updated the SiteInfo global.`);
 };
 
 try {
