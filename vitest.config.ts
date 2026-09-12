@@ -30,6 +30,7 @@ export default defineConfig({
         "src/models/**",
         "src/theme/**",
         "src/app/\\(site\\)/layout.tsx",
+        "src/app/global-not-found.tsx",
         "src/app/\\(payload\\)/**",
         "src/blocks/**",
         "src/collections/**",
