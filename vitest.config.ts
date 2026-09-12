@@ -29,7 +29,7 @@ export default defineConfig({
         "src/constants/**",
         "src/models/**",
         "src/theme/**",
-        "src/app/layout.tsx",
+        "src/app/\\(site\\)/layout.tsx",
         "src/app/\\(payload\\)/**",
         "src/blocks/**",
         "src/collections/**",
