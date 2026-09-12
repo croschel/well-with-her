@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 import { ArticleCard } from "@/components/molecules/ArticleCard";
 import type { Article } from "@/models/interfaces";
@@ -19,12 +19,16 @@ export const ArticleGrid = ({ articles }: ArticleGridProps) => {
   }
 
   return (
-    <Grid container spacing={3}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        gap: 3.75,
+      }}
+    >
       {articles.map((article) => (
-        <Grid key={article.id} size={{ xs: 12, sm: 6, md: 4 }}>
-          <ArticleCard article={article} />
-        </Grid>
+        <ArticleCard key={article.id} article={article} />
       ))}
-    </Grid>
+    </Box>
   );
 };

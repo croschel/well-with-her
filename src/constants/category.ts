@@ -6,3 +6,12 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   [Category.Nutrition]: "Nutrition",
   [Category.Wellness]: "Wellness",
 };
+
+export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
+  [Category.WomensHealth]: "Hormones, cycles, and caring for your body.",
+  [Category.Sleep]: "Rest better, wake up brighter.",
+  [Category.Nutrition]:
+    "Simple, evidence-inspired food and supplement guidance.",
+  [Category.Wellness]:
+    "Everyday rituals for a calmer, more balanced life.",
+};

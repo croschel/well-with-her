@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { CategoryIcon } from "@/components/atoms/CategoryIcon";
 import { ArticleGrid } from "@/components/organisms/ArticleGrid";
-import { CATEGORY_LABELS } from "@/constants/category";
+import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS } from "@/constants/category";
 import {
   CATEGORY_PAGE_DESCRIPTION,
   CATEGORY_PAGE_TITLE,
@@ -49,9 +49,18 @@ export default async function CategoryPage({
       >
         <CategoryIcon
           category={category}
-          sx={{ fontSize: 48, color: "primary.main" }}
+          sx={{ fontSize: 30, color: "primary.main" }}
         />
         <Typography variant="h3">{CATEGORY_LABELS[category]}</Typography>
+        <Typography
+          sx={{
+            fontFamily: "var(--font-parisienne), cursive",
+            fontSize: 20,
+            color: "primary.dark",
+          }}
+        >
+          {CATEGORY_DESCRIPTIONS[category]}
+        </Typography>
       </Stack>
       <ArticleGrid articles={articles} />
     </Container>
