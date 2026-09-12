@@ -12,6 +12,7 @@ export interface Article {
   category: Category;
   pinId: string;
   slug: string;
+  title: string;
   mainArticleContent: RichTextContent;
   buyButtonUrl: string;
   heroImage: MediaAsset;
