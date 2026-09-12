@@ -42,7 +42,7 @@ export default async function CategoryPage({
   const articles = await listByCategory(category);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
+    <Container maxWidth="lg" sx={{ px: 5, py: 8 }}>
       <Stack
         spacing={1}
         sx={{ alignItems: "center", textAlign: "center", mb: 6 }}

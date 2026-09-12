@@ -81,7 +81,7 @@ export default async function HomePage() {
         </Stack>
       </Box>
 
-      <Container maxWidth="lg" sx={{ pt: 1, pb: 8 }}>
+      <Container maxWidth="lg" sx={{ px: 5, pt: 1, pb: 8 }}>
         <Typography variant="h4" sx={{ mb: 3.5 }}>
           {LATEST_ARTICLES_HEADING}
         </Typography>

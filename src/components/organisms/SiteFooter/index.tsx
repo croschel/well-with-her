@@ -31,7 +31,7 @@ export const SiteFooter = () => (
       mt: "auto",
     }}
   >
-    <Container maxWidth="lg" sx={{ pt: 6.5, pb: 3.75 }}>
+    <Container maxWidth="lg" sx={{ px: 5, pt: 6.5, pb: 3.75 }}>
       <Grid container spacing={4.5}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>
@@ -127,31 +127,30 @@ export const SiteFooter = () => (
       </Grid>
     </Container>
 
-    <Box sx={{ borderTop: "1px solid", borderColor: "divider" }}>
-      <Container maxWidth="lg">
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            py: 2.25,
-          }}
-        >
-          <Typography variant="caption" color="secondary.main">
-            {COPYRIGHT_TEXT(new Date().getFullYear())}
-          </Typography>
-          <Typography
-            component={NextLink}
-            href={ROUTES.contact}
-            variant="caption"
-            sx={{ color: "primary.main", textDecoration: "none" }}
-          >
-            {CONTACT_LABEL}
-          </Typography>
-        </Stack>
-      </Container>
-    </Box>
+    <Stack
+      direction="row"
+      spacing={1.5}
+      sx={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        borderTop: "1px solid",
+        borderColor: "divider",
+        px: 5,
+        py: 2.25,
+      }}
+    >
+      <Typography variant="caption" color="secondary.main">
+        {COPYRIGHT_TEXT(new Date().getFullYear())}
+      </Typography>
+      <Typography
+        component={NextLink}
+        href={ROUTES.contact}
+        variant="caption"
+        sx={{ color: "primary.main", textDecoration: "none" }}
+      >
+        {CONTACT_LABEL}
+      </Typography>
+    </Stack>
   </Box>
 );
