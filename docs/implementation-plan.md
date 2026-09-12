@@ -159,6 +159,27 @@ guessing when that ticket starts.
   layer's deliberately-loose `RichTextContent` (`Record<string, unknown>`) to Lexical's
   `SerializedEditorState` fails TS2352 (insufficient overlap) without the `unknown` hop.
 
+**Discovered in Ticket 6 (PR 2 — article page SEO):**
+- Payload's local media adapter serves relative URLs (`/api/media/file/...`) since no `serverURL`
+  is configured. Next's Metadata API silently resolves relative `openGraph`/`twitter` image URLs
+  against `metadataBase` — confirmed by inspecting the built static HTML, `og:image` came out fully
+  qualified with no extra code. A hand-written `<script type="application/ld+json">` gets none of
+  that resolution for free, so `buildArticleJsonLd` prefixes a relative image URL with the site URL
+  itself; skipping this would have shipped relative image URLs into structured data, which crawlers
+  (including Pinterest's) may not resolve correctly.
+- Root layout had no `metadataBase` at all before this ticket — added
+  `new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000")`, which is also required
+  for the relative-URL resolution above to work at all (Next silently no-ops OG image resolution
+  without it, no error).
+- Editor-authored fields (`article.title`, `ogDescription`) flow directly into the JSON-LD
+  `dangerouslySetInnerHTML` string. `JSON.stringify` escapes quotes but not a literal `</script>`
+  sequence, so the article page Unicode-escapes every less-than sign in the serialized JSON before
+  injection (see the `.replace(...)` call right next to the `dangerouslySetInnerHTML` prop).
+- No real Pinterest business account is connected yet, so the domain-verification meta tag
+  (`p:domain_verify`) is wired to only render when `PINTEREST_DOMAIN_VERIFY_CODE` is set — same
+  "don't hardcode a placeholder" treatment as the footer's inert social links from the design
+  alignment pass.
+
 ---
 
 ## 2. Open decisions requiring approval
