@@ -5,12 +5,24 @@ import type { Metadata } from "next";
 
 import { SiteFooter } from "@/components/organisms/SiteFooter";
 import { SiteHeader } from "@/components/organisms/SiteHeader";
+import { DEFAULT_META_DESCRIPTION, SITE_NAME } from "@/constants/seo";
 import { AppProviders } from "@/providers/AppProviders";
 import { jost, parisienne, playfairDisplay } from "@/theme/fonts";
 
+const pinterestDomainVerifyCode = process.env.PINTEREST_DOMAIN_VERIFY_CODE;
+
 export const metadata: Metadata = {
-  title: "WellWithHer",
-  description: "Wellness articles and stories from WellWithHer.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
+  title: SITE_NAME,
+  description: DEFAULT_META_DESCRIPTION,
+  // No Pinterest business account connected yet — the meta tag only
+  // renders once a real verification code is set, same non-hardcoded
+  // treatment as the footer's placeholder social links.
+  ...(pinterestDomainVerifyCode
+    ? { verification: { other: { "p:domain_verify": pinterestDomainVerifyCode } } }
+    : {}),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

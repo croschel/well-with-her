@@ -79,15 +79,66 @@ describe("generateStaticParams", () => {
 });
 
 describe("generateMetadata", () => {
-  it("builds a title and description for an existing article", async () => {
+  it("builds a title, description, canonical URL, and OG/Twitter tags", async () => {
     mockGetByRoute.mockResolvedValue(buildArticle());
 
     const metadata = await generateMetadata(
       buildProps("sleep", "pin002", "wind-down-routine"),
     );
 
-    expect(metadata.title).toBe("A Wind-Down Routine");
+    expect(metadata.title).toBe("A Wind-Down Routine — WellWithHer");
     expect(metadata.description).toBe("A short blurb.");
+    expect(metadata.alternates).toEqual({
+      canonical: "/sleep/pin002/wind-down-routine",
+    });
+    expect(metadata.openGraph).toMatchObject({
+      type: "article",
+      title: "A Wind-Down Routine",
+      description: "A short blurb.",
+      url: "/sleep/pin002/wind-down-routine",
+      siteName: "WellWithHer",
+      publishedTime: "2026-01-01T00:00:00.000Z",
+      images: [
+        {
+          url: "https://example.com/hero.jpg",
+          alt: "A calm bedroom",
+        },
+      ],
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      title: "A Wind-Down Routine",
+      description: "A short blurb.",
+      images: ["https://example.com/hero.jpg"],
+    });
+  });
+
+  it("falls back to the default site description when ogDescription is missing", async () => {
+    mockGetByRoute.mockResolvedValue(buildArticle({ ogDescription: undefined }));
+
+    const metadata = await generateMetadata(
+      buildProps("sleep", "pin002", "wind-down-routine"),
+    );
+
+    expect(metadata.description).toBe(
+      "Wellness articles and stories from WellWithHer.",
+    );
+  });
+
+  it("prefers ogImage over heroImage for OG/Twitter images when present", async () => {
+    mockGetByRoute.mockResolvedValue(
+      buildArticle({
+        ogImage: { url: "https://example.com/og.jpg", alt: "OG image" },
+      }),
+    );
+
+    const metadata = await generateMetadata(
+      buildProps("sleep", "pin002", "wind-down-routine"),
+    );
+
+    expect(metadata.twitter).toMatchObject({
+      images: ["https://example.com/og.jpg"],
+    });
   });
 
   it("returns empty metadata for an unknown category", async () => {
@@ -124,6 +175,22 @@ describe("ArticlePage", () => {
     expect(
       screen.getByRole("link", { name: "Shop this pick →" }),
     ).toHaveAttribute("href", "https://example.com/shop");
+  });
+
+  it("renders Article JSON-LD structured data", async () => {
+    mockGetByRoute.mockResolvedValue(buildArticle());
+
+    const { container } = render(
+      await ArticlePage(buildProps("sleep", "pin002", "wind-down-routine")),
+    );
+
+    const script = container.querySelector('script[type="application/ld+json"]');
+    expect(script).not.toBeNull();
+    const jsonLd = JSON.parse(script?.innerHTML ?? "{}");
+    expect(jsonLd).toMatchObject({
+      "@type": "Article",
+      headline: "A Wind-Down Routine",
+    });
   });
 
   it("calls notFound() for an unknown category", async () => {
