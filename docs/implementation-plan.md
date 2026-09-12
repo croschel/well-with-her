@@ -94,6 +94,24 @@ the schema push succeeds against live Postgres, and `npm run seed` created the S
 sample articles — verified directly via `neon psql`. Remaining manual step for Caique: open `/admin`
 and create the real first user (email/password are his to choose, not something to seed).
 
+**Discovered in Ticket 3:**
+- MUI v9 removed `alignItems`/`justifyContent` as top-level `Stack` props (confirmed against
+  Stack's own current docs, not memory) — they now must go through `sx`. `direction`/`spacing`
+  still work as direct props; layout-alignment props don't.
+- Testing Library's auto-cleanup depends on detecting a *global* `afterEach` (Jest-style). Our
+  `vitest.config.ts` intentionally runs with `globals: false`, so cleanup never registered — DOM
+  from one test leaked into the next within the same file. Fixed by calling `cleanup()` manually
+  in `vitest.setup.ts`'s own `afterEach`. Worth remembering: this bites any new test file with more
+  than one render in a describe block, and might not surface until a query happens to match text
+  from a still-mounted previous render.
+- Next 16's multi-root-layout pattern (this app now has two: `(site)` and `(payload)`) has a real
+  gap: a `not-found.tsx` inside one route group only catches `notFound()` thrown *within* that
+  group's tree — a genuinely unmatched top-level URL falls through to Next's unbranded built-in
+  404 instead, since Next has no single layout to compose a global one from. Confirmed by curling
+  an unmatched path and finding "404: This page could not be found." Fixed with Next 16's
+  `global-not-found.tsx` convention (experimental flag `experimental.globalNotFound`), which
+  bypasses every layout and needs its own fonts/theme/providers wired in explicitly.
+
 ---
 
 ## 2. Open decisions requiring approval
