@@ -140,6 +140,25 @@ This closed the loop for Ticket 6 too: the extracted source includes the *exact*
 (byline, pull-quote block style, CTA button copy, sticky aside bio box copy/layout) — no more
 guessing when that ticket starts.
 
+**Discovered in Ticket 6 (PR 1 — article page core):**
+- `payload-types.ts` does not generate typed shapes for blocks nested inside a richtext field (only
+  top-level collection fields) — confirmed by grepping the generated file for the 4 block slugs and
+  finding zero matches. The 4 block renderers (`ImageBlockRenderer`, `GalleryBlockRenderer`,
+  `VideoEmbedBlockRenderer`, `CtaBlockRenderer`) each hand-write their own `*BlockFields` interface
+  instead, matched against `Articles.ts`'s `BlocksFeature` config.
+- `DefaultNodeTypes` and `SerializedBlockNode` are exported from `@payloadcms/richtext-lexical`'s
+  root entry (re-exported from its internal `nodeTypes.js`), not from a `/react` or `/exports`
+  subpath — `import type { DefaultNodeTypes, SerializedBlockNode } from "@payloadcms/richtext-lexical"`
+  is correct as documented.
+- `Article.buyButtonUrl` is a required top-level field on every article, separate from the optional
+  `ctaBlock` an editor can insert inline in the richtext body. The article page renders both: the
+  dedicated `buyButtonUrl` as a "Shop this pick →" `BuyButton` after the body, and any inline
+  `ctaBlock`s wherever the editor placed them in the content.
+- An `sx` value passed through as a plain object with `unknown`-cast `RichText` `data` prop needed
+  `content as unknown as Parameters<typeof RichText>[0]["data"]` — a direct cast from the domain
+  layer's deliberately-loose `RichTextContent` (`Record<string, unknown>`) to Lexical's
+  `SerializedEditorState` fails TS2352 (insufficient overlap) without the `unknown` hop.
+
 ---
 
 ## 2. Open decisions requiring approval
