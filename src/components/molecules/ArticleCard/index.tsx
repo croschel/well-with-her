@@ -30,6 +30,7 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
           alignItems: "stretch",
           display: "flex",
           flexDirection: "column",
+          color: "text.primary",
         }}
       >
         <CardMedia
@@ -53,7 +54,7 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
               {CATEGORY_LABELS[article.category]}
             </Typography>
           </Stack>
-          <Typography variant="h6" component="h3">
+          <Typography variant="h6" component="h3" color="text.primary">
             {article.title}
           </Typography>
           {article.ogDescription ? (

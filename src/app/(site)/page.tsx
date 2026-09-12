@@ -57,6 +57,7 @@ export default async function HomePage() {
                   alignItems: "center",
                   textAlign: "center",
                   textDecoration: "none",
+                  color: "text.primary",
                   p: 3,
                   borderRadius: 3,
                   bgcolor: "background.paper",
@@ -68,7 +69,7 @@ export default async function HomePage() {
                   category={category}
                   sx={{ fontSize: 32, color: "primary.main" }}
                 />
-                <Typography variant="subtitle1">
+                <Typography variant="subtitle1" color="text.primary">
                   {CATEGORY_LABELS[category]}
                 </Typography>
               </Stack>
