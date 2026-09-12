@@ -456,6 +456,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteInfo {
   id: number;
+  /**
+   * Full-bleed photo at the top of the home page.
+   */
+  homeHeroImage?: (number | null) | Media;
   asideContent: {
     root: {
       type: string;
@@ -483,6 +487,7 @@ export interface SiteInfo {
  * via the `definition` "site-info_select".
  */
 export interface SiteInfoSelect<T extends boolean = true> {
+  homeHeroImage?: T;
   asideContent?: T;
   disclosure?: T;
   updatedAt?: T;

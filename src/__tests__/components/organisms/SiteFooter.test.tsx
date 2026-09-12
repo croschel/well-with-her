@@ -12,24 +12,32 @@ describe("SiteFooter", () => {
     }
   });
 
-  it("renders Home and Contact links", () => {
+  it("renders About and Contact links, plus non-linking placeholders", () => {
     render(<SiteFooter />);
 
-    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute(
       "href",
       "/",
     );
-    expect(screen.getByRole("link", { name: "Contact" })).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "Contact" })[0]).toHaveAttribute(
       "href",
       "/contact",
     );
+    // Privacy Policy, Pinterest, and Instagram have no real destination yet
+    // — rendered as plain text, not dead links.
+    expect(screen.getByText("Privacy Policy")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Privacy Policy" })).toBeNull();
+    expect(screen.getByText("Pinterest")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Pinterest" })).toBeNull();
   });
 
   it("renders the current year in the copyright line", () => {
     render(<SiteFooter />);
 
     expect(
-      screen.getByText(`© ${new Date().getFullYear()} WellWithHer`),
+      screen.getByText(
+        `© ${new Date().getFullYear()} WellWithHer. All rights reserved.`,
+      ),
     ).toBeInTheDocument();
   });
 });

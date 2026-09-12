@@ -5,6 +5,14 @@ export const SiteInfo: GlobalConfig = {
   slug: "site-info",
   fields: [
     {
+      name: "homeHeroImage",
+      type: "upload",
+      relationTo: "media",
+      admin: {
+        description: "Full-bleed photo at the top of the home page.",
+      },
+    },
+    {
       name: "asideContent",
       type: "richText",
       required: true,
