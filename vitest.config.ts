@@ -8,6 +8,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@payload-config": fileURLToPath(
+        new URL("./payload.config.ts", import.meta.url),
+      ),
     },
   },
   test: {
