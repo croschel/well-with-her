@@ -112,6 +112,34 @@ and create the real first user (email/password are his to choose, not something 
   `global-not-found.tsx` convention (experimental flag `experimental.globalNotFound`), which
   bypasses every layout and needs its own fonts/theme/providers wired in explicitly.
 
+**Design alignment pass (post-Ticket 5, pre-Ticket 6) — 2026-09-12.** Tickets 3–5 were built from
+the architecture doc's *textual* description and colors/fonts grepped out of the design reference
+bundle, since this environment has no browser to actually render it. Caique shared a Claude Design
+artifact URL for the real prototype; it turned out to be readable directly — the bundle's manifest
+(`<script type="__bundler/manifest">` and `__bundler/template">`) contains the actual component
+source (HTML/CSS template + a decompressible hero photo) as plain JSON, not just a runtime-rendered
+black box. Decoding it gave an exact spec instead of a description, and closed real gaps:
+- **Two theme colors were wrong.** `text.secondary` was `#6b5c4a`; the real value for nav
+  links/inactive UI is `#5c4a3a`, while `#6b5c4a` is a *third*, distinct tone used only for body/
+  excerpt copy (no slot in MUI's two-tier text palette — added as a plain `BODY_TEXT_COLOR`
+  constant rather than fighting the theme's type system for one narrow use).
+- **CTA buttons are a dark ink pill** (`text.primary` bg), not the sage accent — sage is reserved
+  for icons/links/active states. Added via MUI v9's `variants` API (the older per-variant-color
+  slot key like `containedPrimary` no longer exists as a stylable key).
+- Header nav is hidden on Home, text-only (no icons); footer is 4 columns not 3 (adds Company and
+  Follow); category pages get a real Parisienne-script tagline per category; Home's hero is a
+  full-bleed photo, not a text band; article cards use a 4:3 ratio, hover lift, and a "Read more →"
+  affordance the original build didn't have.
+- Real bug this surfaced: an `sx` value that's a function (`theme.transitions.create(...)`) breaks
+  Server→Client prop serialization once a component is actually rendered from a Server Component in
+  a real `next build` — `next dev` never caught it. Plain CSS strings for `transition` from now on.
+- Added `SiteInfo.homeHeroImage` (optional upload) and made `scripts/seed.ts` idempotent (it wasn't
+  — reseeding threw on the unique `pinId` constraint and silently duplicated media rows).
+
+This closed the loop for Ticket 6 too: the extracted source includes the *exact* article page spec
+(byline, pull-quote block style, CTA button copy, sticky aside bio box copy/layout) — no more
+guessing when that ticket starts.
+
 ---
 
 ## 2. Open decisions requiring approval
