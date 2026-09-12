@@ -21,8 +21,16 @@ describe("SiteHeader", () => {
     ).toHaveAttribute("href", "/");
   });
 
-  it("renders a link for every category", () => {
+  it("hides the category nav on the home page", () => {
     mockUsePathname.mockReturnValue("/");
+    render(<SiteHeader />);
+
+    expect(screen.queryByLabelText("Category navigation")).toBeNull();
+    expect(screen.queryByText("Sleep")).toBeNull();
+  });
+
+  it("renders a link for every category on non-home pages", () => {
+    mockUsePathname.mockReturnValue("/sleep");
     render(<SiteHeader />);
 
     for (const label of ["Women's Health", "Sleep", "Nutrition", "Wellness"]) {

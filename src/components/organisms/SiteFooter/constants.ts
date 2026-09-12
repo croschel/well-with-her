@@ -1,6 +1,11 @@
-export const FOOTER_TAGLINE = "Gentle wellness, one small step at a time.";
+export const FOOTER_TAGLINE = "Evidence-inspired tips for a healthier life.";
 export const CATEGORIES_HEADING = "Categories";
-export const SITE_HEADING = "Site";
-export const HOME_LABEL = "Home";
+export const COMPANY_HEADING = "Company";
+export const FOLLOW_HEADING = "Follow";
+export const ABOUT_LABEL = "About";
 export const CONTACT_LABEL = "Contact";
-export const COPYRIGHT_TEXT = (year: number) => `© ${year} WellWithHer`;
+export const PRIVACY_POLICY_LABEL = "Privacy Policy";
+export const PINTEREST_LABEL = "Pinterest";
+export const INSTAGRAM_LABEL = "Instagram";
+export const COPYRIGHT_TEXT = (year: number) =>
+  `© ${year} WellWithHer. All rights reserved.`;
