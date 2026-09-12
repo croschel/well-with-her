@@ -8,6 +8,15 @@ export const CREAM_TINTS = {
   400: "#e6dcc8",
 } as const;
 
+// Doesn't fit the numbered tint scale above — used only for the footer,
+// per the design reference.
+export const FOOTER_BACKGROUND = "#efe4d2";
+
+// text.secondary (#5c4a3a) is for nav links and inactive UI labels — the
+// design reference's own body/excerpt copy uses a distinct, slightly
+// lighter tone that MUI's two-tier text palette has no slot for.
+export const BODY_TEXT_COLOR = "#6b5c4a";
+
 export const palette: ThemeOptions["palette"] = {
   mode: "light",
   primary: {
@@ -25,7 +34,7 @@ export const palette: ThemeOptions["palette"] = {
   },
   text: {
     primary: "#4a3222",
-    secondary: "#6b5c4a",
+    secondary: "#5c4a3a",
   },
   divider: "#d8cdb8",
 };
