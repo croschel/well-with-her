@@ -17,6 +17,11 @@ export const FOOTER_BACKGROUND = "#efe4d2";
 // lighter tone that MUI's two-tier text palette has no slot for.
 export const BODY_TEXT_COLOR = "#6b5c4a";
 
+// A fourth, distinct tone used only for full article body paragraphs
+// (longer-form reading copy gets slightly more contrast than card
+// excerpts) — per the design reference's article page.
+export const ARTICLE_BODY_TEXT_COLOR = "#4a3a2c";
+
 export const palette: ThemeOptions["palette"] = {
   mode: "light",
   primary: {
