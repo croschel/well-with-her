@@ -16,6 +16,7 @@ export const mapArticle = (doc: PayloadArticle): Article => ({
   category: toCategory(doc.category),
   pinId: doc.pinId,
   slug: doc.slug,
+  title: doc.title,
   mainArticleContent: doc.mainArticleContent,
   buyButtonUrl: doc.buyButtonUrl,
   heroImage: resolveMediaAsset(doc.heroImage),

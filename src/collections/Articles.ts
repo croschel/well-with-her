@@ -26,8 +26,8 @@ export const Articles: CollectionConfig = {
     delete: ({ req }) => req.user?.role === "admin",
   },
   admin: {
-    useAsTitle: "pinId",
-    defaultColumns: ["category", "pinId", "slug", "publishedAt"],
+    useAsTitle: "title",
+    defaultColumns: ["title", "category", "pinId", "publishedAt"],
     livePreview: {
       url: ({ data }) =>
         `${process.env.NEXT_PUBLIC_SITE_URL}/${data.category}/${data.pinId}/${data.slug}`,
@@ -62,6 +62,15 @@ export const Articles: CollectionConfig = {
       type: "text",
       required: true,
       unique: true,
+    },
+    {
+      name: "title",
+      type: "text",
+      required: true,
+      admin: {
+        description:
+          "The article's headline — used on cards, the article page, and the browser title.",
+      },
     },
     {
       name: "mainArticleContent",

@@ -135,6 +135,10 @@ export interface Article {
    */
   pinId: string;
   slug: string;
+  /**
+   * The article's headline — used on cards, the article page, and the browser title.
+   */
+  title: string;
   mainArticleContent: {
     root: {
       type: string;
@@ -318,6 +322,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   category?: T;
   pinId?: T;
   slug?: T;
+  title?: T;
   mainArticleContent?: T;
   buyButtonUrl?: T;
   heroImage?: T;
