@@ -95,8 +95,8 @@ const run = async () => {
 
   const heroImage = await findOrUploadMedia(
     payload,
-    "A woman relaxing in cream loungewear by a sunlit window — placeholder from the design reference, replace with licensed photography before launch.",
-    "home-hero-placeholder.png",
+    "A woman in cream loungewear sitting by a sunlit window next to potted greenery — WellWithHer home hero banner, placeholder from the design reference, replace with licensed photography before launch.",
+    "home-hero-banner.png",
   );
 
   await payload.updateGlobal({

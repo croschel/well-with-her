@@ -40,7 +40,16 @@ export default async function HomePage() {
           component="img"
           src={siteInfo.homeHeroImage.url}
           alt={siteInfo.homeHeroImage.alt || HERO_IMAGE_ALT}
-          sx={{ display: "block", width: "100%", height: "auto" }}
+          sx={{
+            display: "block",
+            width: "100%",
+            // `height: auto` scaled purely off the image's native aspect
+            // ratio — on large screens the banner grew tall enough to fill
+            // most of the viewport. Clamp it instead, same approach as
+            // ArticleHero's hero image.
+            height: "clamp(200px, 28vw, 460px)",
+            objectFit: "cover",
+          }}
         />
       ) : null}
 
