@@ -203,6 +203,27 @@ guessing when that ticket starts.
   `payload run` script created and then deleted a row via the same Local API path the Server Action
   uses, confirming the full create path against the live Neon DB before deleting the script.
 
+**Unlisted fix (post-Ticket 7) — home hero banner height.** Caique reported the home hero image
+was tall enough to dominate the viewport on large screens. Root cause: it used `height: auto`,
+which scales purely off the image's native aspect ratio with no cap. Fixed with
+`clamp(200px, 28vw, 460px)` + `object-fit: cover`, the same approach `ArticleHero` already uses for
+its own hero image. Also swapped in a new banner asset Caique provided and cleaned up the orphaned
+old placeholder `media` row the reseed left behind (`findOrUploadMedia` dedups by `alt` text, so a
+changed alt creates a new row rather than updating in place) — confirmed via `neon psql`.
+
+**Discovered in Ticket 8 (sitemap.ts + robots.ts):**
+- `SITE_URL` (`process.env.NEXT_PUBLIC_SITE_URL` with a `localhost:3000` fallback) had been
+  duplicated three different ways across the codebase, and one copy — `Articles.ts`'s
+  `livePreview.url` — had no fallback at all, so Live Preview would silently render
+  `undefined/category/...` with the env var unset. Centralized into `constants/seo.ts`.
+- `ArticleRouteRef` (used by `generateStaticParams` for route params) didn't carry `publishedAt`,
+  but the sitemap needs it for `lastModified`. Added it as an optional field threaded through
+  `mapArticleRouteRef` and `listPublishedRefs`'s `select`, rather than standing up a second,
+  near-identical listing function next to one that already does 90% of the job.
+- `robots.ts`'s ticket scope said "allowing all," but literally allowing everything would let
+  crawlers index the CMS admin login and raw API responses — neither is public content. Disallowed
+  `/admin` and `/api` specifically; everything else stays open.
+
 ---
 
 ## 2. Open decisions requiring approval
