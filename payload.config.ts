@@ -8,6 +8,7 @@ import { buildConfig } from "payload";
 import sharp from "sharp";
 
 import { Articles } from "@/collections/Articles";
+import { ContactMessages } from "@/collections/ContactMessages";
 import { Media } from "@/collections/Media";
 import { Users } from "@/collections/Users";
 import { SiteInfo } from "@/globals/SiteInfo";
@@ -18,7 +19,7 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
-  collections: [Articles, Media, Users],
+  collections: [Articles, ContactMessages, Media, Users],
   globals: [SiteInfo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET ?? "",
