@@ -32,4 +32,19 @@ export const components: ThemeOptions["components"] = {
       }),
     },
   },
+  MuiOutlinedInput: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        borderRadius: 6,
+        backgroundColor: theme.palette.background.paper,
+        "& .MuiOutlinedInput-notchedOutline": {
+          borderColor: theme.palette.divider,
+        },
+      }),
+      input: {
+        padding: "13px 16px",
+        fontSize: 15,
+      },
+    },
+  },
 };

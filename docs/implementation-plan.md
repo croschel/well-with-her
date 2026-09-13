@@ -180,6 +180,29 @@ guessing when that ticket starts.
   "don't hardcode a placeholder" treatment as the footer's inert social links from the design
   alignment pass.
 
+**Discovered in Ticket 7 (contact page):**
+- Payload's Local API (`payload.create()`, etc.) bypasses collection `access` control by default —
+  confirmed against Payload's own docs, not assumed. Since the contact form's Server Action is the
+  only intended writer of `ContactMessages` and it uses the Local API, `access.create` is set to
+  `() => false` to close the public REST/GraphQL create endpoint against spam without breaking the
+  form itself.
+- Adding a new collection doesn't push its table to the live Postgres schema by itself —
+  `payload generate:types` only regenerates `payload-types.ts`; the schema push (`drizzle-kit`'s
+  "Pulling schema from database" step) only runs on a real Payload boot (`payload run <script>` or
+  `next dev`), matching the dev-mode-only push behavior already noted in Ticket 1. Re-running the
+  (idempotent) seed script was enough to trigger it and create the `contact_messages` table —
+  confirmed directly via `neon psql`.
+- React 19's `<form action={fn}>` mechanism (used by `useActionState`) isn't reliably submittable
+  in jsdom — clicking a submit button hits jsdom's incomplete `HTMLFormElement.requestSubmit`
+  support and throws "A React form was unexpectedly submitted" instead of invoking the action.
+  `ContactForm`'s tests mock `useActionState` itself (returning fixed `[state, formAction, pending]`
+  tuples) to test the presentational states directly, rather than driving them through a real
+  (unreliable) form submission; the actual validation/persistence logic is covered separately by
+  unit-testing `submitContactForm` in isolation.
+- Verified the Server Action's DB write for real (not just mocked): a throwaway
+  `payload run` script created and then deleted a row via the same Local API path the Server Action
+  uses, confirming the full create path against the live Neon DB before deleting the script.
+
 ---
 
 ## 2. Open decisions requiring approval

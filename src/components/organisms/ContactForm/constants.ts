@@ -1,0 +1,10 @@
+export const NAME_LABEL = "Name";
+export const EMAIL_LABEL = "Email";
+export const MESSAGE_LABEL = "Message";
+export const SUBMIT_LABEL = "Send message";
+export const SUBMIT_PENDING_LABEL = "Sending…";
+export const SUCCESS_TITLE = "Thank you!";
+export const SUCCESS_MESSAGE = "We'll get back to you soon.";
+export const NAME_REQUIRED_ERROR = "Enter your name.";
+export const EMAIL_INVALID_ERROR = "Enter a valid email address.";
+export const MESSAGE_REQUIRED_ERROR = "Enter a message.";
