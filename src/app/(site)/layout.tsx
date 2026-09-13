@@ -5,16 +5,14 @@ import type { Metadata } from "next";
 
 import { SiteFooter } from "@/components/organisms/SiteFooter";
 import { SiteHeader } from "@/components/organisms/SiteHeader";
-import { DEFAULT_META_DESCRIPTION, SITE_NAME } from "@/constants/seo";
+import { DEFAULT_META_DESCRIPTION, SITE_NAME, SITE_URL } from "@/constants/seo";
 import { AppProviders } from "@/providers/AppProviders";
 import { jost, parisienne, playfairDisplay } from "@/theme/fonts";
 
 const pinterestDomainVerifyCode = process.env.PINTEREST_DOMAIN_VERIFY_CODE;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
+  metadataBase: new URL(SITE_URL),
   title: SITE_NAME,
   description: DEFAULT_META_DESCRIPTION,
   // No Pinterest business account connected yet — the meta tag only

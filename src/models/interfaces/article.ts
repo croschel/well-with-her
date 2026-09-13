@@ -27,4 +27,5 @@ export interface ArticleRouteRef {
   category: Category;
   pinId: string;
   slug: string;
+  publishedAt?: string;
 }

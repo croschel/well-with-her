@@ -28,9 +28,10 @@ export const mapArticle = (doc: PayloadArticle): Article => ({
 });
 
 export const mapArticleRouteRef = (
-  doc: Pick<PayloadArticle, "category" | "pinId" | "slug">,
+  doc: Pick<PayloadArticle, "category" | "pinId" | "slug" | "publishedAt">,
 ): ArticleRouteRef => ({
   category: toCategory(doc.category),
   pinId: doc.pinId,
   slug: doc.slug,
+  publishedAt: doc.publishedAt,
 });
