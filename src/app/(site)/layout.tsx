@@ -2,9 +2,12 @@ import "./globals.css";
 
 import { Box } from "@mui/material";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
+import { AnalyticsScripts } from "@/components/organisms/AnalyticsScripts";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
 import { SiteHeader } from "@/components/organisms/SiteHeader";
+import { UtmTracker } from "@/components/organisms/UtmTracker";
 import { DEFAULT_META_DESCRIPTION, SITE_NAME, SITE_URL } from "@/constants/seo";
 import { AppProviders } from "@/providers/AppProviders";
 import { jost, parisienne, playfairDisplay } from "@/theme/fonts";
@@ -31,6 +34,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body>
         <AppProviders>
+          <Suspense fallback={null}>
+            <UtmTracker />
+          </Suspense>
           <Box
             sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
           >
@@ -41,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <SiteFooter />
           </Box>
         </AppProviders>
+        <AnalyticsScripts />
       </body>
     </html>
   );

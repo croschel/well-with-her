@@ -22,6 +22,7 @@ vi.mock("@/services/siteInfo", () => ({
 
 vi.mock("next/navigation", () => ({
   notFound: mockNotFound,
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 import ArticlePage, {

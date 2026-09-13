@@ -244,6 +244,25 @@ changed alt creates a new row rather than updating in place) — confirmed via `
   catch-all regardless of which route group defines it. Confirmed in the build output: both routes
   listed separately, `/api/revalidate` as its own entry.
 
+**Discovered in Ticket 10 (analytics & UTM capture):**
+- `useSearchParams()` requires a Suspense boundary somewhere between it and the page root, or the
+  entire route opts out of static generation. `BuyButton` appears twice on the article page (the
+  main CTA plus any inline `ctaBlock`s in the body) — rather than pushing that concern onto every
+  call site, `BuyButton` wraps its own `useSearchParams`-consuming inner component in `Suspense`
+  internally, with the plain undecorated link as the fallback. Confirmed via `next build` that
+  article/category/home routes are still listed as static, not dynamic, after this change.
+- `next/script`'s `afterInteractive` strategy doesn't render anything synchronously in a bare RTL/
+  jsdom test — it inserts the `<script>` tag via an effect tied to Next's client runtime, which
+  isn't mounted in an isolated component test. `AnalyticsScripts`'s tests mock `next/script` down to
+  a plain `<script>` element to make the id/content assertions possible — the same category of
+  workaround as mocking `useActionState` for `ContactForm` in Ticket 7 (a Next/React API that
+  doesn't function outside a full app runtime, not a bug in the component under test).
+- Added a global `useSearchParams` mock to `vitest.setup.ts` (default: no UTM params), since after
+  this ticket any component reachable from a rendered page can end up depending on it transitively.
+  A test file that already has its own `next/navigation` mock (the article page's, for `notFound`)
+  fully replaces this default and needed `useSearchParams` added to its own factory — discovered
+  via failing tests, not anticipated in advance.
+
 ---
 
 ## 2. Open decisions requiring approval
