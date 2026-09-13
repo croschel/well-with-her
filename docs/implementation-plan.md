@@ -272,6 +272,26 @@ changed alt creates a new row rather than updating in place) — confirmed via `
 why the "CI=true, skip params" approach the plan originally leaned toward wouldn't have actually
 worked without touching all four files.
 
+**Discovered in Ticket 12 (Vercel deploy docs):** the plan's §12 suggestion to register the Vercel
+Blob host in `next.config.ts`'s `images.remotePatterns` turned out to be moot — this codebase
+never adopted `next/image` anywhere (confirmed via grep), every image is a plain `<img>`. Nothing
+to configure there. The Vercel connection, env var entry, live-deploy verification, and Pinterest
+Rich Pin check itself all need Caique's own Vercel account access, which this environment doesn't
+have — only the two docs (`vercel-deploy-checklist.md`, `authoring-guide.md`) shipped from here;
+the ticket stays open until he completes the dashboard steps.
+
+**Discovered in Ticket 13 (skills & subagents):** writing skills against the *real* codebase
+surfaced several places where §10's original sketch (written before any code existed) no longer
+matched reality: `@tanstack/react-query` is installed but genuinely unwired — no
+`QueryClientProvider` in `AppProviders.tsx`, `src/queries/` is still an empty `.gitkeep`, and
+`NavSearch` remains UI-only per its own comment (the plan's "eventual TanStack Query consumer" has
+not happened yet). `utils/seo.ts`/`utils/jsonLd.ts` (the plan's guessed filenames) never existed —
+the real implementation became `constants/seo.ts` + `utils/buildArticleJsonLd.ts`. And the actual
+test-mirror convention has two forms in practice, not one: a flat `<Name>.test.tsx` for simple
+components, and a nested `<Name>/*.test.ts(x)` folder for ones with sibling files worth testing
+separately (`ContactForm`'s `actions.ts`, `ArticleBody`'s block renderers) — the plan's mirror
+example only showed the flat form.
+
 ---
 
 ## 2. Open decisions requiring approval
