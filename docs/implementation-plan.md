@@ -263,6 +263,15 @@ changed alt creates a new row rather than updating in place) — confirmed via `
   fully replaces this default and needed `useSearchParams` added to its own factory — discovered
   via failing tests, not anticipated in advance.
 
+**Discovered in Ticket 11 (CI pipeline):** grepping for every page/route that imports from
+`@/services/*` (rather than trusting the plan's original framing, which only mentioned
+`generateStaticParams`) found 4 files hitting Payload during static generation: `(site)/page.tsx`
+(`listRecent`, `siteInfo.get`), `(site)/[category]/page.tsx` (`listByCategory`),
+`(site)/[category]/[pinId]/[slug]/page.tsx` (`getByRoute`, `listPublishedRefs`), and
+`app/sitemap.ts` (`listPublishedRefs`). See §8's updated CI database resolution above — this is
+why the "CI=true, skip params" approach the plan originally leaned toward wouldn't have actually
+worked without touching all four files.
+
 ---
 
 ## 2. Open decisions requiring approval
@@ -887,12 +896,14 @@ jobs:
 # ── Future: deploy job goes here. Out of scope for this plan. ──
 ```
 
-**Open CI question to resolve in Ticket 10, not now:** `next build` runs `generateStaticParams`,
-which needs content. Options are (a) a CI-only Neon branch with seed data, (b) a build-time flag that
-returns `[]` from `generateStaticParams` when `CI=true` (pages then render on demand — the build
-still validates compilation and types, which is all CI needs), or (c) mocked fixtures. **Preference:
-(b)** — CI's job is "does this compile, lint, type-check and pass tests," not "does the content
-render." Vercel's preview build does the real thing against the real database.
+**CI database question — ✅ resolved in Ticket 11 (2026-09-12): option (a), real DB, read-only.**
+The original framing above (skip `generateStaticParams` when `CI=true`) undersold the actual
+scope — Home, Category, and `sitemap.ts` all fetch from Payload directly in their page/route body,
+not just inside `generateStaticParams`, so a fix scoped to the article route's params alone
+wouldn't have been enough; every route needed accounting for. Rather than add CI-only conditional
+branches to four files (a code path that never runs in production), CI's build step reads the real
+Neon database via `CI_DATABASE_URI`/`CI_PAYLOAD_SECRET` repo secrets — `next build` never writes,
+so this is safe, and it matches the "Vercel's preview build does the real thing" reasoning below.
 
 **Scripts to add to `package.json`:**
 
