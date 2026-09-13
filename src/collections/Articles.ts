@@ -18,6 +18,7 @@ import { GalleryBlock } from "@/blocks/GalleryBlock";
 import { ImageBlock } from "@/blocks/ImageBlock";
 import { VideoEmbedBlock } from "@/blocks/VideoEmbedBlock";
 import { SITE_URL } from "@/constants/seo";
+import { revalidateArticlePaths } from "@/utils/revalidateArticlePaths";
 import { validateVideoEmbedUrl } from "@/utils/validateVideoEmbedUrl";
 
 export const Articles: CollectionConfig = {
@@ -32,6 +33,32 @@ export const Articles: CollectionConfig = {
     livePreview: {
       url: ({ data }) => `${SITE_URL}/${data.category}/${data.pinId}/${data.slug}`,
     },
+  },
+  hooks: {
+    afterChange: [
+      ({ doc, previousDoc, operation }) => {
+        revalidateArticlePaths(doc);
+
+        // The article may have moved category or changed its URL entirely
+        // (pinId/slug) — the old paths need revalidating too, or the
+        // stale category listing / old URL would keep serving cached
+        // content indefinitely.
+        const moved =
+          operation === "update" &&
+          previousDoc &&
+          (previousDoc.category !== doc.category ||
+            previousDoc.pinId !== doc.pinId ||
+            previousDoc.slug !== doc.slug);
+        if (moved) {
+          revalidateArticlePaths(previousDoc);
+        }
+      },
+    ],
+    afterDelete: [
+      ({ doc }) => {
+        revalidateArticlePaths(doc);
+      },
+    ],
   },
   versions: {
     drafts: true,

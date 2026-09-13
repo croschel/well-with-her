@@ -224,6 +224,26 @@ changed alt creates a new row rather than updating in place) — confirmed via `
   crawlers index the CMS admin login and raw API responses — neither is public content. Disallowed
   `/admin` and `/api` specifically; everything else stays open.
 
+**Discovered in Ticket 9 (publish → revalidation):**
+- `revalidatePath` throws (`Invariant: static generation store missing in revalidatePath ...`) when
+  called with no active Next.js request/build context — confirmed by reading Next's own
+  `revalidate.js` source, not assumed. Payload's collection hooks fire in exactly that missing-
+  context situation whenever a write happens outside a real request — `payload run
+  scripts/seed.ts` being the one this project already runs regularly. Without a guard, wiring
+  `revalidatePath` into `afterChange`/`afterDelete` would have broken every future `npm run seed`.
+  `revalidateArticlePaths` wraps the calls in try/catch; verified for real (not just reasoned about)
+  by running a throwaway create → update-category → delete against the live Neon DB via the Local
+  API and confirming none of the three hook paths threw.
+- On `afterChange` for an *update*, Payload's `previousDoc` argument carries the pre-save document —
+  used it to detect when `category`/`pinId`/`slug` changed and revalidate the *old* path too, not
+  just the new one. Skipping this would leave a stale cached page at the article's old URL (and a
+  stale old-category listing) indefinitely after an editor moves or renames an article.
+- `src/app/api/revalidate/route.ts` sits alongside `(payload)/api/[...slug]/route.ts` (Payload's own
+  catch-all, mounted at the same `/api/*` URL space from a different route group) without
+  conflicting — Next resolves the more specific literal segment (`/api/revalidate`) over the
+  catch-all regardless of which route group defines it. Confirmed in the build output: both routes
+  listed separately, `/api/revalidate` as its own entry.
+
 ---
 
 ## 2. Open decisions requiring approval
