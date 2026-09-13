@@ -92,17 +92,19 @@ describe("mapArticle", () => {
 });
 
 describe("mapArticleRouteRef", () => {
-  it("maps only the route fields", () => {
+  it("maps the route fields plus publishedAt", () => {
     const ref = mapArticleRouteRef({
       category: "nutrition",
       pinId: "pin003",
       slug: "breakfast",
+      publishedAt: "2026-01-01T00:00:00.000Z",
     });
 
     expect(ref).toEqual({
       category: Category.Nutrition,
       pinId: "pin003",
       slug: "breakfast",
+      publishedAt: "2026-01-01T00:00:00.000Z",
     });
   });
 });

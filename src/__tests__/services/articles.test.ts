@@ -138,9 +138,16 @@ describe("getByRoute", () => {
 });
 
 describe("listPublishedRefs", () => {
-  it("selects only the route fields with no depth or limit", async () => {
+  it("selects the route fields plus publishedAt, with no depth or limit", async () => {
     mockFind.mockResolvedValue({
-      docs: [{ category: "sleep", pinId: "pin002", slug: "wind-down-routine" }],
+      docs: [
+        {
+          category: "sleep",
+          pinId: "pin002",
+          slug: "wind-down-routine",
+          publishedAt: "2026-01-01T00:00:00.000Z",
+        },
+      ],
     });
 
     const result = await articles.listPublishedRefs();
@@ -150,11 +157,16 @@ describe("listPublishedRefs", () => {
         collection: "articles",
         limit: 0,
         depth: 0,
-        select: { category: true, pinId: true, slug: true },
+        select: { category: true, pinId: true, slug: true, publishedAt: true },
       }),
     );
     expect(result).toEqual([
-      { category: Category.Sleep, pinId: "pin002", slug: "wind-down-routine" },
+      {
+        category: Category.Sleep,
+        pinId: "pin002",
+        slug: "wind-down-routine",
+        publishedAt: "2026-01-01T00:00:00.000Z",
+      },
     ]);
   });
 });

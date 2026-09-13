@@ -8,13 +8,16 @@ import { ArticleHero } from "@/components/organisms/ArticleHero";
 import { AsideBioBox } from "@/components/organisms/AsideBioBox";
 import { BUY_BUTTON_LABEL } from "@/constants/articlePage";
 import { ROUTES } from "@/constants/routes";
-import { ARTICLE_PAGE_TITLE,DEFAULT_META_DESCRIPTION, SITE_NAME } from "@/constants/seo";
+import {
+  ARTICLE_PAGE_TITLE,
+  DEFAULT_META_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/constants/seo";
 import { getByRoute, listPublishedRefs } from "@/services/articles";
 import { get as getSiteInfo } from "@/services/siteInfo";
 import { buildArticleJsonLd } from "@/utils/buildArticleJsonLd";
 import { isCategory } from "@/utils/isCategory";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const generateStaticParams = async () => {
   const refs = await listPublishedRefs();

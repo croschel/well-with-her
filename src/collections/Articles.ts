@@ -17,6 +17,7 @@ import { CtaBlock } from "@/blocks/CtaBlock";
 import { GalleryBlock } from "@/blocks/GalleryBlock";
 import { ImageBlock } from "@/blocks/ImageBlock";
 import { VideoEmbedBlock } from "@/blocks/VideoEmbedBlock";
+import { SITE_URL } from "@/constants/seo";
 import { validateVideoEmbedUrl } from "@/utils/validateVideoEmbedUrl";
 
 export const Articles: CollectionConfig = {
@@ -29,8 +30,7 @@ export const Articles: CollectionConfig = {
     useAsTitle: "title",
     defaultColumns: ["title", "category", "pinId", "publishedAt"],
     livePreview: {
-      url: ({ data }) =>
-        `${process.env.NEXT_PUBLIC_SITE_URL}/${data.category}/${data.pinId}/${data.slug}`,
+      url: ({ data }) => `${SITE_URL}/${data.category}/${data.pinId}/${data.slug}`,
     },
   },
   versions: {

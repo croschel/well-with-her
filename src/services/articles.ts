@@ -60,7 +60,7 @@ export const listPublishedRefs = async (): Promise<ArticleRouteRef[]> => {
     collection: "articles",
     limit: 0,
     depth: 0,
-    select: { category: true, pinId: true, slug: true },
+    select: { category: true, pinId: true, slug: true, publishedAt: true },
   });
   return result.docs.map(mapArticleRouteRef);
 };
