@@ -292,6 +292,29 @@ components, and a nested `<Name>/*.test.ts(x)` folder for ones with sibling file
 separately (`ContactForm`'s `actions.ts`, `ArticleBody`'s block renderers) — the plan's mirror
 example only showed the flat form.
 
+**Post-launch incident (2026-09-14) — drafts and unpublished articles were publicly visible.**
+Caught live, on the deployed site, not in review: a real editor-created draft (with no hero image
+set — drafts skip required-field validation) got included in `generateStaticParams` and crashed the
+production build. Root cause was two compounding bugs that had existed since Ticket 2, silent the
+whole time because every seeded/scripted article was always immediately published with no lingering
+drafts:
+1. Every service call used Payload's Local API with its default `overrideAccess: true`, which skips
+   the collection's `access.read` rule entirely — the rule was defined (Ticket 1) but never actually
+   enforced by any query.
+2. The access rule itself only checked `publishedAt <= now()`, never Payload's own `_status`
+   (draft/published) — and `publishedAt` defaults to "now" the instant an article is first saved,
+   draft or not, so it was never a reliable published/unpublished signal on its own.
+Fixed both: `overrideAccess: false` on every public-facing service call, and the access rule now
+requires `_status: "published"` AND `publishedAt <= now()`. Verified directly against the live DB
+(not just mocks) that a real draft with a past `publishedAt` is now correctly excluded everywhere —
+listings, `generateStaticParams`, and `sitemap.ts` alike.
+
+Also surfaced during the same incident, unrelated: on-demand revalidation (`revalidatePath`, both
+the automatic hook and the manual `/api/revalidate` escape hatch) reported success but did not
+actually refresh stale category/home listing pages on Vercel — worked around with a full redeploy,
+root cause not yet found. Needs real investigation with access to Vercel's function logs, which
+this environment doesn't have.
+
 ---
 
 ## 2. Open decisions requiring approval

@@ -13,6 +13,7 @@ export const listRecent = async (limit = 6): Promise<Article[]> => {
     sort: "-publishedAt",
     limit,
     depth: 1,
+    overrideAccess: false,
   });
   return result.docs.map(mapArticle);
 };
@@ -28,6 +29,7 @@ export const listByCategory = async (
     sort: "-publishedAt",
     limit,
     depth: 1,
+    overrideAccess: false,
   });
   return result.docs.map(mapArticle);
 };
@@ -36,6 +38,14 @@ export const getByRoute = async (
   ref: ArticleRouteRef,
   options?: { draft?: boolean },
 ): Promise<Article | null> => {
+  // `overrideAccess: false` is the only thing that actually applies the
+  // collection's access.read rule (publishedAt <= now()) — Payload's Local
+  // API bypasses access control by default, and the `draft` option below is
+  // unrelated: it only controls which table (main vs versions) is read, not
+  // who's allowed to see the result. A draft preview (options.draft: true,
+  // not yet consumed anywhere) needs overrideAccess left permissive so an
+  // editor can see their own unpublished draft.
+  const isDraftPreview = options?.draft ?? false;
   const payload = await getPayloadClient();
   const result = await payload.find({
     collection: "articles",
@@ -46,7 +56,8 @@ export const getByRoute = async (
         { slug: { equals: ref.slug } },
       ],
     },
-    draft: options?.draft ?? false,
+    draft: isDraftPreview,
+    overrideAccess: isDraftPreview,
     depth: 1,
     limit: 1,
   });
@@ -61,6 +72,7 @@ export const listPublishedRefs = async (): Promise<ArticleRouteRef[]> => {
     limit: 0,
     depth: 0,
     select: { category: true, pinId: true, slug: true, publishedAt: true },
+    overrideAccess: false,
   });
   return result.docs.map(mapArticleRouteRef);
 };
@@ -92,6 +104,7 @@ export const search = async (term: string, limit = 10): Promise<Article[]> => {
     where: { or: conditions },
     limit,
     depth: 1,
+    overrideAccess: false,
   });
   return result.docs.map(mapArticle);
 };
