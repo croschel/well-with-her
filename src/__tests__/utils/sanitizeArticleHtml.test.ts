@@ -52,6 +52,34 @@ describe("sanitizeArticleHtml", () => {
     expect(result).toContain('src="https://example.com/a.png"');
   });
 
+  it("degrades a link with a non-URL placeholder href to plain text", () => {
+    // A real bug hit in production: an AI-generated CTA with a literal
+    // "YOUR-AFFILIATE-LINK-HERE" href passed sanitize-html's scheme check
+    // (schemeless strings have no scheme to reject) but then failed
+    // Payload's LinkFeature validation on save, blocking the whole
+    // document — degrading to text up front means the save just works.
+    const result = sanitizeArticleHtml(
+      '<a href="YOUR-AFFILIATE-LINK-HERE">Shop now</a>',
+    );
+
+    expect(result).not.toContain("<a");
+    expect(result).toContain("Shop now");
+  });
+
+  it("degrades a relative-path href to plain text", () => {
+    const result = sanitizeArticleHtml('<a href="/some-page">link</a>');
+
+    expect(result).not.toContain("<a");
+    expect(result).toContain("link");
+  });
+
+  it("degrades a link with no href to plain text", () => {
+    const result = sanitizeArticleHtml("<a>link</a>");
+
+    expect(result).not.toContain("<a");
+    expect(result).toContain("link");
+  });
+
   it("keeps a color style declaration", () => {
     const result = sanitizeArticleHtml(
       '<span style="color: #8a9678;">sage text</span>',
