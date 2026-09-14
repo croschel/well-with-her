@@ -11,7 +11,7 @@ import {
   ParagraphFeature,
   UnorderedListFeature,
 } from "@payloadcms/richtext-lexical";
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, Where } from "payload";
 
 import { CtaBlock } from "@/blocks/CtaBlock";
 import { GalleryBlock } from "@/blocks/GalleryBlock";
@@ -24,7 +24,18 @@ import { validateVideoEmbedUrl } from "@/utils/validateVideoEmbedUrl";
 export const Articles: CollectionConfig = {
   slug: "articles",
   access: {
-    read: ({ req }) => Boolean(req.user) || { publishedAt: { less_than_equal: new Date().toISOString() } },
+    // `publishedAt` alone isn't enough to gate public access — it's a plain
+    // content field that defaults to "now" the moment an article is first
+    // saved, draft or not. `_status` is Payload's own draft/publish state;
+    // both must hold for an anonymous reader to see the article.
+    read: ({ req }) => {
+      if (req.user) return true;
+      const publicOnly: Where[] = [
+        { _status: { equals: "published" } },
+        { publishedAt: { less_than_equal: new Date().toISOString() } },
+      ];
+      return { and: publicOnly };
+    },
     delete: ({ req }) => req.user?.role === "admin",
   },
   admin: {
