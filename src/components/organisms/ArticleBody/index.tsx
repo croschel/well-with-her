@@ -7,6 +7,7 @@ import {
 
 import type { RichTextContent } from "@/models/interfaces";
 import { ARTICLE_BODY_TEXT_COLOR, BODY_TEXT_COLOR } from "@/theme/palette";
+import { parseInlineStyleString } from "@/utils/parseInlineStyleString";
 
 import { type CtaBlockFields,CtaBlockRenderer } from "./blocks/CtaBlockRenderer";
 import { type GalleryBlockFields,GalleryBlockRenderer } from "./blocks/GalleryBlockRenderer";
@@ -27,6 +28,22 @@ const converters: JSXConvertersFunction<DefaultNodeTypes | ArticleBlockNode> = (
   defaultConverters,
 }) => ({
   ...defaultConverters,
+  // Payload's own default text converter only ever checks the bold/italic/
+  // etc. format bitmask — it silently ignores a text node's `style` field
+  // (confirmed by reading its source, not assumed), so an imported color
+  // would be stored correctly but never actually render without this.
+  text: (args) => {
+    // Payload's own type only allows a function here at runtime; the
+    // non-function arm exists purely to satisfy a wider library type.
+    /* v8 ignore next 3 */
+    const rendered =
+      typeof defaultConverters.text === "function"
+        ? defaultConverters.text(args)
+        : defaultConverters.text;
+    const style = (args.node as { style?: string }).style;
+    if (!style) return rendered;
+    return <span style={parseInlineStyleString(style)}>{rendered}</span>;
+  },
   blocks: {
     imageBlock: ({ node }) => <ImageBlockRenderer {...node.fields} />,
     galleryBlock: ({ node }) => <GalleryBlockRenderer {...node.fields} />,

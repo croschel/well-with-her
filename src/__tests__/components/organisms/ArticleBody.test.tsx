@@ -45,6 +45,36 @@ describe("ArticleBody", () => {
     expect(screen.getByText("Body paragraph copy.")).toBeInTheDocument();
   });
 
+  it("wraps a text node carrying a style field in a styled span", () => {
+    render(
+      <ArticleBody
+        content={buildContent([
+          {
+            type: "paragraph",
+            format: "",
+            indent: 0,
+            version: 1,
+            direction: null,
+            children: [
+              {
+                type: "text",
+                format: 0,
+                detail: 0,
+                mode: "normal",
+                style: "color:#8a9678",
+                version: 1,
+                text: "Sage colored copy.",
+              },
+            ],
+          },
+        ])}
+      />,
+    );
+
+    const styledText = screen.getByText("Sage colored copy.");
+    expect(styledText).toHaveStyle({ color: "#8a9678" });
+  });
+
   it("renders a ctaBlock node via the CtaBlockRenderer", () => {
     render(
       <ArticleBody
