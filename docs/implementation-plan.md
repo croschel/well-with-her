@@ -362,6 +362,21 @@ style HTML — custom fonts, spacing, background boxes, dividers — will lose a
 and keep only its text, headings, bold, links and any inline color. That's by design, not a bug,
 but it's a real gap between what gets pasted and what renders.
 
+**Second post-merge fix — a placeholder link href crashed the save, not just the import.** With
+the import map fixed, the first real import (the same sample article) still failed, with Payload
+throwing `link node failed to validate: The following fields are invalid: url` on save. Root cause,
+confirmed by running the reported HTML directly through the pipeline: `sanitizeArticleHtml`'s
+`allowedSchemes` check only rejects a href with a *disallowed* scheme (`javascript:`, `data:`) — a
+schemeless placeholder like `href="YOUR-AFFILIATE-LINK-HERE"` has no scheme to reject at all, so it
+passed straight through and became a Lexical link node with that literal string as its `url`.
+Lexical's `LinkFeature` then fails that field's validation on save, and since it's one field inside
+a single large richText document, the *entire* article fails to save — not just the broken link.
+Fixed by requiring an absolute `http(s)` href on every `<a>` in `sanitizeArticleHtml`; anything else
+now degrades to plain text instead of reaching the editor as a broken link. A good reminder for this
+importer generally: AI-generated marketing HTML routinely ships placeholder hrefs and CTAs meant for
+a page builder, not a single rich-text field — anything user-facing here needs to degrade instead of
+throwing when the source content is malformed in ways a real editor never would produce.
+
 ---
 
 ## 2. Open decisions requiring approval
