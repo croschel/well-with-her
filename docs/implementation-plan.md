@@ -343,6 +343,25 @@ UI panel itself (`HtmlImportPanel`) is unverified interactively — this environ
 to open `/admin` in — everything else was verified with unit tests plus a real run against the
 live DB (a real image genuinely downloaded and uploaded to Media, then cleaned up).
 
+**Post-merge fix — the panel never actually appeared in the deployed admin.** Payload's admin
+custom components resolve through a generated, *committed* import map file
+(`src/app/(payload)/admin/importMap.js`), not through normal module resolution — and unlike
+`payload-types.ts`, it is not regenerated automatically by `next build`. The PR added
+`HtmlImportPanel` to the Articles collection config but never ran `payload generate:importmap`
+afterward, so the field was wired up with no entry in the map and silently failed to render.
+Caught live: with no working panel, the only way to get HTML into the site was pasting it straight
+into the rich text editor, which (correctly, since it's a WYSIWYG editor, not an HTML source view)
+just turned every line into its own paragraph of literal, escaped text. Fixed by running
+`payload generate:importmap` and committing the result. Worth remembering for any future custom
+admin component: the import map has to be regenerated and committed as its own step, the same way
+`payload generate:types` already is for `payload-types.ts`.
+
+Also worth flagging for real content going forward: the importer's intentionally narrow scope
+(structure + text color only, from the design discussion above) means a from-scratch "hero page"
+style HTML — custom fonts, spacing, background boxes, dividers — will lose all of that on import
+and keep only its text, headings, bold, links and any inline color. That's by design, not a bug,
+but it's a real gap between what gets pasted and what renders.
+
 ---
 
 ## 2. Open decisions requiring approval
