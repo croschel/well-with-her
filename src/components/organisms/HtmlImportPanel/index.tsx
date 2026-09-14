@@ -3,6 +3,8 @@
 import { Button, useField } from "@payloadcms/ui";
 import { useState } from "react";
 
+import { importArticleHtml } from "@/services/importArticleHtml";
+
 import {
   EMPTY_ERROR,
   FAILURE_ERROR,
@@ -38,20 +40,7 @@ export const HtmlImportPanel = () => {
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/articles/import-html", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html }),
-      });
-
-      if (!response.ok) {
-        setStatus("error");
-        setErrorMessage(FAILURE_ERROR);
-        return;
-      }
-
-      const { content } = (await response.json()) as { content: unknown };
+      const content = await importArticleHtml(html);
       setValue(content);
       setStatus("success");
     } catch {

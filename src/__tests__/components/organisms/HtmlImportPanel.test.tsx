@@ -1,10 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockSetValue, mockUseField } = vi.hoisted(() => ({
+const { mockSetValue, mockUseField, mockImportArticleHtml } = vi.hoisted(() => ({
   mockSetValue: vi.fn(),
   mockUseField: vi.fn(),
+  mockImportArticleHtml: vi.fn(),
 }));
 
 vi.mock("@payloadcms/ui", () => ({
@@ -24,38 +25,32 @@ vi.mock("@payloadcms/ui", () => ({
   ),
 }));
 
-import { HtmlImportPanel } from "@/components/organisms/HtmlImportPanel";
+vi.mock("@/services/importArticleHtml", () => ({
+  importArticleHtml: mockImportArticleHtml,
+}));
 
-const mockFetch = vi.fn();
+import { HtmlImportPanel } from "@/components/organisms/HtmlImportPanel";
 
 beforeEach(() => {
   mockSetValue.mockReset();
   mockUseField.mockReturnValue({ setValue: mockSetValue });
-  vi.stubGlobal("fetch", mockFetch);
-  mockFetch.mockReset();
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
+  mockImportArticleHtml.mockReset();
 });
 
 describe("HtmlImportPanel", () => {
-  it("shows an error and does not call fetch when the textarea is empty", async () => {
+  it("shows an error and does not call the import service when the textarea is empty", async () => {
     const user = userEvent.setup();
     render(<HtmlImportPanel />);
 
     await user.click(screen.getByRole("button", { name: "Import into article body" }));
 
     expect(await screen.findByText("Paste some HTML first.")).toBeInTheDocument();
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockImportArticleHtml).not.toHaveBeenCalled();
   });
 
   it("imports successfully and sets the mainArticleContent field value", async () => {
     const user = userEvent.setup();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ content: { root: { children: [] } } }),
-    });
+    mockImportArticleHtml.mockResolvedValue({ root: { children: [] } });
 
     render(<HtmlImportPanel />);
     await user.type(
@@ -65,19 +60,13 @@ describe("HtmlImportPanel", () => {
     await user.click(screen.getByRole("button", { name: "Import into article body" }));
 
     expect(await screen.findByText(/Imported/)).toBeInTheDocument();
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/articles/import-html",
-      expect.objectContaining({
-        method: "POST",
-        body: JSON.stringify({ html: "<p>hello</p>" }),
-      }),
-    );
+    expect(mockImportArticleHtml).toHaveBeenCalledWith("<p>hello</p>");
     expect(mockSetValue).toHaveBeenCalledWith({ root: { children: [] } });
   });
 
-  it("shows an error when the request fails", async () => {
+  it("shows an error when the import service rejects", async () => {
     const user = userEvent.setup();
-    mockFetch.mockResolvedValue({ ok: false });
+    mockImportArticleHtml.mockRejectedValue(new Error("Import failed with status 500"));
 
     render(<HtmlImportPanel />);
     await user.type(screen.getByLabelText("Paste HTML to import"), "<p>x</p>");
@@ -87,18 +76,5 @@ describe("HtmlImportPanel", () => {
       await screen.findByText("Import failed — check the HTML and try again."),
     ).toBeInTheDocument();
     expect(mockSetValue).not.toHaveBeenCalled();
-  });
-
-  it("shows an error when fetch itself throws", async () => {
-    const user = userEvent.setup();
-    mockFetch.mockRejectedValue(new Error("network down"));
-
-    render(<HtmlImportPanel />);
-    await user.type(screen.getByLabelText("Paste HTML to import"), "<p>x</p>");
-    await user.click(screen.getByRole("button", { name: "Import into article body" }));
-
-    expect(
-      await screen.findByText("Import failed — check the HTML and try again."),
-    ).toBeInTheDocument();
   });
 });
