@@ -315,6 +315,34 @@ actually refresh stale category/home listing pages on Vercel — worked around w
 root cause not yet found. Needs real investigation with access to Vercel's function logs, which
 this environment doesn't have.
 
+**Discovered in Ticket 14 (sanitized HTML paste-to-article importer):** built to let AI-generated
+article drafts (raw HTML from an external chat tool) be pasted into `/admin` and turned into real
+`mainArticleContent`, instead of typing everything by hand. A few things only turned up by running
+the real dependencies, not by reading their docs:
+1. `$generateNodesFromDOM` (Lexical's own official HTML importer, from `@lexical/html`) has no
+   built-in handling for `<span>` at all — a colored span's text silently merges into the
+   surrounding plain text with the color just dropped. Fixed with a custom `TextNode` subclass
+   registering an `importDOM()` handler for `span[style]`, the documented Lexical extension point
+   for teaching the importer about a tag it doesn't otherwise recognize.
+2. Payload's own default JSX `text` converter (`richtext-lexical`'s renderer) only ever checks the
+   bold/italic/strikethrough/underline/code/sub/superscript format bitmask — it silently ignores a
+   text node's `style` field entirely. A color imported and saved correctly would never actually
+   render on the article page without a custom `text` converter override in `ArticleBody`.
+3. Real serialized Lexical link-node shape differs from what memory suggested: `rel`/`target`/
+   `title`/`url` sit directly on the node, not inside a `fields` wrapper — confirmed by running the
+   actual converter and inspecting output, not assumed, before anything was built against it.
+4. `jsdom` (needed by `convertHtmlToLexicalNodes` at runtime, not just in tests) had to move from
+   `devDependencies` to `dependencies` — Vercel prunes dev deps from production installs, and this
+   would have built fine locally and crashed the first real import in production.
+Scope is intentionally limited to Option 3 from the earlier design discussion: sanitize pasted
+HTML (`sanitize-html`, strict tag/attribute allowlist, a small color/background-color-only style
+allowlist to prevent CSS-based click-hijacking), convert it to real Lexical nodes, and re-download
+any images into the site's own Media collection (AI-generated image URLs are typically temporary
+and would silently break within hours otherwise). No AI API involved, no ongoing cost. The admin
+UI panel itself (`HtmlImportPanel`) is unverified interactively — this environment has no browser
+to open `/admin` in — everything else was verified with unit tests plus a real run against the
+live DB (a real image genuinely downloaded and uploaded to Media, then cleaned up).
+
 ---
 
 ## 2. Open decisions requiring approval
