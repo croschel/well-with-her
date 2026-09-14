@@ -17,6 +17,7 @@ import { CtaBlock } from "@/blocks/CtaBlock";
 import { GalleryBlock } from "@/blocks/GalleryBlock";
 import { ImageBlock } from "@/blocks/ImageBlock";
 import { VideoEmbedBlock } from "@/blocks/VideoEmbedBlock";
+import { importArticleHtmlHandler } from "@/collections/endpoints/importArticleHtml";
 import { SITE_URL } from "@/constants/seo";
 import { revalidateArticlePaths } from "@/utils/revalidateArticlePaths";
 import { validateVideoEmbedUrl } from "@/utils/validateVideoEmbedUrl";
@@ -45,6 +46,9 @@ export const Articles: CollectionConfig = {
       url: ({ data }) => `${SITE_URL}/${data.category}/${data.pinId}/${data.slug}`,
     },
   },
+  endpoints: [
+    { path: "/import-html", method: "post", handler: importArticleHtmlHandler },
+  ],
   hooks: {
     afterChange: [
       ({ doc, previousDoc, operation }) => {
@@ -108,6 +112,18 @@ export const Articles: CollectionConfig = {
       admin: {
         description:
           "The article's headline — used on cards, the article page, and the browser title.",
+      },
+    },
+    {
+      name: "htmlImportPanel",
+      type: "ui",
+      admin: {
+        components: {
+          Field: {
+            path: "@/components/organisms/HtmlImportPanel",
+            exportName: "HtmlImportPanel",
+          },
+        },
       },
     },
     {
