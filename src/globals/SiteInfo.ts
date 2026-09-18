@@ -27,5 +27,23 @@ export const SiteInfo: GlobalConfig = {
           "Affiliate/sponsored-link disclosure shown above the buy button on every article (FTC requirement).",
       },
     },
+    {
+      name: "privacyPolicyContent",
+      type: "richText",
+      required: true,
+      editor: lexicalEditor(),
+      admin: {
+        description: "Full content of the public /privacy-policy page.",
+      },
+    },
+    {
+      name: "affiliateDisclosureContent",
+      type: "richText",
+      required: true,
+      editor: lexicalEditor(),
+      admin: {
+        description: "Full content of the public /affiliate-disclosure page.",
+      },
+    },
   ],
 };
