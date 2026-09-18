@@ -39,6 +39,7 @@ const buildArticleDoc = (overrides: Partial<Article> = {}): Article => ({
   slug: "wind-down-routine",
   title: "A Wind-Down Routine",
   mainArticleContent: richText,
+  buyButtonLabel: "Shop this pick →",
   buyButtonUrl: "https://example.com/shop",
   heroImage: media,
   galleryImages: null,

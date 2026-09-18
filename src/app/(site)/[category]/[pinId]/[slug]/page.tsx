@@ -6,7 +6,6 @@ import { BuyButton } from "@/components/atoms/BuyButton";
 import { ArticleBody } from "@/components/organisms/ArticleBody";
 import { ArticleHero } from "@/components/organisms/ArticleHero";
 import { AsideBioBox } from "@/components/organisms/AsideBioBox";
-import { BUY_BUTTON_LABEL } from "@/constants/articlePage";
 import { ROUTES } from "@/constants/routes";
 import {
   ARTICLE_PAGE_TITLE,
@@ -102,7 +101,10 @@ export default async function ArticlePage({
         <Box sx={{ flex: "2 1 560px", minWidth: 0 }}>
           <ArticleBody content={article.mainArticleContent} />
           <Box sx={{ mt: 4 }}>
-            <BuyButton label={BUY_BUTTON_LABEL} href={article.buyButtonUrl} />
+            <BuyButton
+              label={article.buyButtonLabel}
+              href={article.buyButtonUrl}
+            />
           </Box>
         </Box>
         <Box sx={{ flex: "1 1 260px", width: "100%" }}>

@@ -30,6 +30,7 @@ const buildArticle = (overrides: Partial<Article> = {}): Article => ({
   slug: "wind-down-routine",
   title: "A Wind-Down Routine",
   mainArticleContent: { root: {} },
+  buyButtonLabel: "Shop this pick →",
   buyButtonUrl: "https://example.com/shop",
   heroImage: { url: "https://example.com/hero.jpg", alt: "A calm bedroom" },
   galleryImages: [],
