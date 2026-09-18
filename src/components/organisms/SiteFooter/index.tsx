@@ -8,6 +8,7 @@ import { FOOTER_BACKGROUND } from "@/theme/palette";
 
 import {
   ABOUT_LABEL,
+  AFFILIATE_DISCLOSURE_LABEL,
   CATEGORIES_HEADING,
   COMPANY_HEADING,
   CONTACT_LABEL,
@@ -96,11 +97,21 @@ export const SiteFooter = () => (
             >
               {CONTACT_LABEL}
             </Typography>
-            {/* No privacy policy page yet — shown as plain text, not a
-                dead link, matching the design reference's own inert
-                placeholder for this item. */}
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              component={NextLink}
+              href={ROUTES.privacyPolicy}
+              variant="body2"
+              sx={{ color: "text.secondary", textDecoration: "none" }}
+            >
               {PRIVACY_POLICY_LABEL}
+            </Typography>
+            <Typography
+              component={NextLink}
+              href={ROUTES.affiliateDisclosure}
+              variant="body2"
+              sx={{ color: "text.secondary", textDecoration: "none" }}
+            >
+              {AFFILIATE_DISCLOSURE_LABEL}
             </Typography>
           </Stack>
         </Grid>
