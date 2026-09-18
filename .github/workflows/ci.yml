@@ -48,9 +48,12 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Read-only: `next build` prerenders pages against the real
-          # content (Home/Category/Article/sitemap.ts all fetch from
-          # Payload during static generation) — it never writes.
+          # `next build` prerenders pages against real content
+          # (Home/Category/Article/sitemap.ts all fetch from Payload during
+          # static generation) — it never writes. Even so, CI_DATABASE_URI
+          # must point at the `development` Neon branch, never `production`:
+          # a schema drift or bad row here should never be able to touch
+          # what the live site serves. See docs/vercel-deploy-checklist.md.
           DATABASE_URI: ${{ secrets.CI_DATABASE_URI }}
           PAYLOAD_SECRET: ${{ secrets.CI_PAYLOAD_SECRET }}
 

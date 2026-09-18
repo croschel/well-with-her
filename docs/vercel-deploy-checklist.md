@@ -4,10 +4,18 @@ Connecting this repo to Vercel requires your Vercel account — this is the part
 has to happen in the Vercel dashboard by hand. Everything below is what to do and why; nothing here
 needs code changes on top of what's already merged.
 
-**Scope for now: QA-only.** No custom domain, no separate staging database — every Vercel
-environment (Production, Preview, Development) points at the same single Neon `production` branch
-this project has used all along. That's an intentional simplification for the pre-launch phase, not
-an oversight — revisit when the site is actually taking real traffic.
+**Databases are now split (2026-09-18 incident).** Every Vercel environment used to point at the
+same single Neon `production` branch — an intentional pre-launch simplification, but it stopped
+being safe the moment real content existed: a database restore taken while debugging a Preview
+deployment rolled back the live site the wife actually uses. Recovered from a Neon-preserved
+pre-rollback branch; see `docs/implementation-plan.md` for the incident writeup. Going forward:
+
+- **`production`** branch — real content only. Used **exclusively** by the Vercel **Production**
+  environment (the live site). Nothing else — no local dev, no CI, no Preview deployments — should
+  ever hold a connection string pointing at it.
+- **`development`** branch — a Neon branch forked from `production`, used by local dev, CI
+  (`CI_DATABASE_URI`), and Vercel **Preview**/**Development** environments. Writes here (seed
+  scripts, schema pushes, manual testing, restores) can't touch real content.
 
 ## 1. Import the repo
 
@@ -20,12 +28,13 @@ an oversight — revisit when the site is actually taking real traffic.
 
 ## 2. Environment variables
 
-Project Settings → Environment Variables. Apply everything below to **all three environments**
-(Production, Preview, Development) unless noted otherwise — see the QA-only note above for why.
+Project Settings → Environment Variables. `DATABASE_URI` now differs by environment — see the
+database-split note above; everything else applies to **all three environments** (Production,
+Preview, Development) unless noted otherwise.
 
 | Variable | What to set | Why |
 |---|---|---|
-| `DATABASE_URI` | Same Neon connection string already in local `.env` | Same DB for every environment right now |
+| `DATABASE_URI` | The `production` branch's connection string for **Production only**; the `development` branch's connection string for **Preview and Development** | Keeps real content isolated from anything a dev/CI/preview run could do to it |
 | `PAYLOAD_SECRET` | **A new, randomly generated secret** — do not reuse the local `local-dev-secret-change-me` placeholder | Signs Payload's admin session tokens; a real deployment needs a real secret |
 | `REVALIDATE_SECRET` | **A new, randomly generated secret** — same reasoning as above | Protects the manual `/api/revalidate` escape hatch |
 | `BLOB_READ_WRITE_TOKEN` | Don't set manually | Add the **Vercel Blob** storage integration to this project first (Storage tab → Create → Blob) — it injects this automatically |
@@ -55,8 +64,9 @@ Generate a random secret however you like — e.g. `openssl rand -base64 32` in 
 
 This should work automatically once the repo is connected — no extra setup. Open (or reopen) any
 PR against `main` and confirm Vercel posts a preview deployment link as a check/comment on it.
-Note: PR previews write to and read from the **same** database as production right now (§ scope
-note above) — don't worry about isolating this until the site has real traffic to protect.
+PR previews now read/write the **`development`** branch (§ database-split note above) — opening a
+preview link can no longer touch real content, which is exactly the isolation the 2026-09-18
+incident showed was missing.
 
 ## 6. Pinterest Rich Pin validator
 
@@ -69,7 +79,9 @@ this step is pure verification of what's already shipped.
 
 `next build` (what Vercel runs) never pushes schema changes to Postgres — only a real Payload boot
 in dev mode does (`npm run seed`, or `next dev`), a behavior already documented in Ticket 1. Once
-this is deployed, **any future collection/field change still needs its schema pushed by running
-`npm run seed` (or any `payload run` script) locally against the same `DATABASE_URI`** before (or
-right after) merging — Vercel's build will not do this for you, and a mismatched schema will error
-at runtime, not at build time.
+this is deployed, **any future collection/field change needs its schema pushed twice, separately**:
+once against the `development` branch's `DATABASE_URI` (to unblock local dev/CI/Preview), and again
+against the **`production`** branch's `DATABASE_URI` (to unblock the live site) — there is no longer
+one shared database that a single local push covers. Do the production push deliberately, right
+before or after merging; Vercel's build will not do this for you, and a mismatched schema will error
+at runtime, not at build time (this is exactly what broke PR #25's CI build on 2026-09-18).

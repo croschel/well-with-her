@@ -43,8 +43,9 @@ export const getByRoute = async (
   // API bypasses access control by default, and the `draft` option below is
   // unrelated: it only controls which table (main vs versions) is read, not
   // who's allowed to see the result. A draft preview (options.draft: true,
-  // not yet consumed anywhere) needs overrideAccess left permissive so an
-  // editor can see their own unpublished draft.
+  // passed by the article route when Next's Draft Mode is on — see
+  // app/(site)/api/draft) needs overrideAccess left permissive so an editor
+  // can see their own unpublished draft.
   const isDraftPreview = options?.draft ?? false;
   const payload = await getPayloadClient();
   const result = await payload.find({
