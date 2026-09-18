@@ -156,6 +156,10 @@ export interface Article {
     };
     [k: string]: unknown;
   };
+  /**
+   * The text shown on the buy button at the end of the article.
+   */
+  buyButtonLabel: string;
   buyButtonUrl: string;
   heroImage: number | Media;
   galleryImages?: (number | Media)[] | null;
@@ -342,6 +346,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   slug?: T;
   title?: T;
   mainArticleContent?: T;
+  buyButtonLabel?: T;
   buyButtonUrl?: T;
   heroImage?: T;
   galleryImages?: T;

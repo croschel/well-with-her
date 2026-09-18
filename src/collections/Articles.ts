@@ -148,6 +148,15 @@ export const Articles: CollectionConfig = {
       }),
     },
     {
+      name: "buyButtonLabel",
+      type: "text",
+      required: true,
+      defaultValue: "Shop this pick →",
+      admin: {
+        description: "The text shown on the buy button at the end of the article.",
+      },
+    },
+    {
       name: "buyButtonUrl",
       type: "text",
       required: true,
