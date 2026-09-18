@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -101,6 +101,13 @@ export default async function ArticlePage({
         <Box sx={{ flex: "2 1 560px", minWidth: 0 }}>
           <ArticleBody content={article.mainArticleContent} />
           <Box sx={{ mt: 4 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mb: 1 }}
+            >
+              {siteInfo.disclosure}
+            </Typography>
             <BuyButton
               label={article.buyButtonLabel}
               href={article.buyButtonUrl}

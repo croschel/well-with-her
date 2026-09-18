@@ -33,6 +33,26 @@ describe("siteInfo.get", () => {
         },
       },
       disclosure: "Some links are affiliate links.",
+      privacyPolicyContent: {
+        root: {
+          type: "root",
+          format: "",
+          indent: 0,
+          version: 1,
+          direction: null,
+          children: [],
+        },
+      },
+      affiliateDisclosureContent: {
+        root: {
+          type: "root",
+          format: "",
+          indent: 0,
+          version: 1,
+          direction: null,
+          children: [],
+        },
+      },
     };
     mockFindGlobal.mockResolvedValue(doc);
 

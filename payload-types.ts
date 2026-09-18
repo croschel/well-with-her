@@ -513,6 +513,42 @@ export interface SiteInfo {
    * Affiliate/sponsored-link disclosure shown above the buy button on every article (FTC requirement).
    */
   disclosure: string;
+  /**
+   * Full content of the public /privacy-policy page.
+   */
+  privacyPolicyContent: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Full content of the public /affiliate-disclosure page.
+   */
+  affiliateDisclosureContent: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -524,6 +560,8 @@ export interface SiteInfoSelect<T extends boolean = true> {
   homeHeroImage?: T;
   asideContent?: T;
   disclosure?: T;
+  privacyPolicyContent?: T;
+  affiliateDisclosureContent?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

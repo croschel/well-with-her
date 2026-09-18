@@ -12,7 +12,7 @@ describe("SiteFooter", () => {
     }
   });
 
-  it("renders About and Contact links, plus non-linking placeholders", () => {
+  it("renders About, Contact, Privacy Policy, and Affiliate Disclosure links, plus non-linking placeholders", () => {
     render(<SiteFooter />);
 
     expect(screen.getByRole("link", { name: "About" })).toHaveAttribute(
@@ -23,10 +23,14 @@ describe("SiteFooter", () => {
       "href",
       "/contact",
     );
-    // Privacy Policy, Pinterest, and Instagram have no real destination yet
-    // — rendered as plain text, not dead links.
-    expect(screen.getByText("Privacy Policy")).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Privacy Policy" })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "Privacy Policy" }),
+    ).toHaveAttribute("href", "/privacy-policy");
+    expect(
+      screen.getByRole("link", { name: "Affiliate Disclosure" }),
+    ).toHaveAttribute("href", "/affiliate-disclosure");
+    // Pinterest and Instagram have no real destination yet — rendered as
+    // plain text, not dead links.
     expect(screen.getByText("Pinterest")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Pinterest" })).toBeNull();
   });
