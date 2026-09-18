@@ -362,6 +362,18 @@ style HTML — custom fonts, spacing, background boxes, dividers — will lose a
 and keep only its text, headings, bold, links and any inline color. That's by design, not a bug,
 but it's a real gap between what gets pasted and what renders.
 
+**Discovered in Ticket 15 (editable buy-button label):** made the bottom-of-article buy button's
+text (previously the hardcoded `BUY_BUTTON_LABEL` constant) a per-article `buyButtonLabel` field
+on Articles, mirroring how `buyButtonUrl` already worked, so the wife can change the wording from
+`/admin` without a code deploy. The one thing worth confirming rather than assuming, given this
+project's "no migrations" caveat (§2 above): adding a required column with a Payload `defaultValue`
+and pushing it via `npm run seed` had drizzle-kit backfill every existing row with that default at
+the Postgres level — verified directly against the live Neon DB (`neon psql -- -c "\d articles"`
+showed the column with its default, and the REST API immediately returned the default label on
+pre-existing articles). No separate backfill script was needed for this shape of change (new
+required text column + default); that won't generalize to a change that needs per-row *different*
+values.
+
 **Second post-merge fix — a placeholder link href crashed the save, not just the import.** With
 the import map fixed, the first real import (the same sample article) still failed, with Payload
 throwing `link node failed to validate: The following fields are invalid: url` on save. Root cause,

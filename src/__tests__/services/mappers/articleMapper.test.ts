@@ -33,6 +33,7 @@ const buildArticleDoc = (overrides: Partial<Article> = {}): Article => ({
   slug: "wind-down-routine",
   title: "A Wind-Down Routine",
   mainArticleContent: richText,
+  buyButtonLabel: "Shop this pick →",
   buyButtonUrl: "https://example.com/shop",
   heroImage: media,
   galleryImages: null,
@@ -54,6 +55,7 @@ describe("mapArticle", () => {
     expect(article.pinId).toBe("pin002");
     expect(article.slug).toBe("wind-down-routine");
     expect(article.title).toBe("A Wind-Down Routine");
+    expect(article.buyButtonLabel).toBe("Shop this pick →");
     expect(article.buyButtonUrl).toBe("https://example.com/shop");
     expect(article.heroImage.url).toBe("https://example.com/hero.jpg");
     expect(article.publishedAt).toBe("2026-01-01T00:00:00.000Z");

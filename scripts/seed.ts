@@ -40,6 +40,7 @@ const SAMPLE_ARTICLES = [
     title: "The Five-Minute Morning Reset",
     ogDescription:
       "A tiny five-minute ritual that sets a calmer tone for the whole day.",
+    buyButtonLabel: "Shop this pick →",
     buyButtonUrl: "https://example.com/shop/morning-reset-kit",
     publishedAt: new Date().toISOString(),
   },
@@ -50,6 +51,7 @@ const SAMPLE_ARTICLES = [
     title: "A Wind-Down Routine for Better Sleep",
     ogDescription:
       "A simple evening sequence that signals to your body it's time to rest.",
+    buyButtonLabel: "Shop this pick →",
     buyButtonUrl: "https://example.com/shop/sleep-kit",
     publishedAt: new Date().toISOString(),
   },
@@ -60,6 +62,7 @@ const SAMPLE_ARTICLES = [
     title: "A Simple Anti-Inflammatory Breakfast",
     ogDescription:
       "An easy, real-food breakfast that's gentle on inflammation and quick to make.",
+    buyButtonLabel: "Shop this pick →",
     buyButtonUrl: "https://example.com/shop/breakfast-kit",
     publishedAt: new Date().toISOString(),
   },

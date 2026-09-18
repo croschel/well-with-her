@@ -14,6 +14,7 @@ export interface Article {
   slug: string;
   title: string;
   mainArticleContent: RichTextContent;
+  buyButtonLabel: string;
   buyButtonUrl: string;
   heroImage: MediaAsset;
   galleryImages: MediaAsset[];
