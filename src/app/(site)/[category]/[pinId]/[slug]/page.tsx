@@ -1,11 +1,13 @@
 import { Box, Stack, Typography } from "@mui/material";
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { BuyButton } from "@/components/atoms/BuyButton";
 import { ArticleBody } from "@/components/organisms/ArticleBody";
 import { ArticleHero } from "@/components/organisms/ArticleHero";
 import { AsideBioBox } from "@/components/organisms/AsideBioBox";
+import { LivePreviewListener } from "@/components/organisms/LivePreviewListener";
 import { ROUTES } from "@/constants/routes";
 import {
   ARTICLE_PAGE_TITLE,
@@ -29,7 +31,8 @@ export async function generateMetadata({
   const { category, pinId, slug } = await params;
   if (!isCategory(category)) return {};
 
-  const article = await getByRoute({ category, pinId, slug });
+  const { isEnabled: isDraft } = await draftMode();
+  const article = await getByRoute({ category, pinId, slug }, { draft: isDraft });
   if (!article) return {};
 
   const url = ROUTES.article(article);
@@ -73,7 +76,8 @@ export default async function ArticlePage({
     notFound();
   }
 
-  const article = await getByRoute({ category, pinId, slug });
+  const { isEnabled: isDraft } = await draftMode();
+  const article = await getByRoute({ category, pinId, slug }, { draft: isDraft });
   if (!article) {
     notFound();
   }
@@ -83,6 +87,7 @@ export default async function ArticlePage({
 
   return (
     <Box sx={{ maxWidth: 1160, mx: "auto", px: 5, py: 8 }}>
+      {isDraft && <LivePreviewListener />}
       {/* Schema.org Article structured data for Pinterest/search rich
           results — escape "<" so editor-authored text can't break out of
           the script tag. */}

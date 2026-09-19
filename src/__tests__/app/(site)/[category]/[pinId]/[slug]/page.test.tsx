@@ -1,15 +1,21 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockGetByRoute, mockListPublishedRefs, mockGetSiteInfo, mockNotFound } =
-  vi.hoisted(() => ({
-    mockGetByRoute: vi.fn(),
-    mockListPublishedRefs: vi.fn(),
-    mockGetSiteInfo: vi.fn(),
-    mockNotFound: vi.fn(() => {
-      throw new Error("NEXT_NOT_FOUND");
-    }),
-  }));
+const {
+  mockGetByRoute,
+  mockListPublishedRefs,
+  mockGetSiteInfo,
+  mockNotFound,
+  mockDraftMode,
+} = vi.hoisted(() => ({
+  mockGetByRoute: vi.fn(),
+  mockListPublishedRefs: vi.fn(),
+  mockGetSiteInfo: vi.fn(),
+  mockNotFound: vi.fn(() => {
+    throw new Error("NEXT_NOT_FOUND");
+  }),
+  mockDraftMode: vi.fn(async () => ({ isEnabled: false })),
+}));
 
 vi.mock("@/services/articles", () => ({
   getByRoute: mockGetByRoute,
@@ -23,6 +29,11 @@ vi.mock("@/services/siteInfo", () => ({
 vi.mock("next/navigation", () => ({
   notFound: mockNotFound,
   useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
+
+vi.mock("next/headers", () => ({
+  draftMode: mockDraftMode,
 }));
 
 import ArticlePage, {
@@ -65,6 +76,8 @@ beforeEach(() => {
   mockGetSiteInfo.mockReset();
   mockNotFound.mockClear();
   mockGetSiteInfo.mockResolvedValue(buildSiteInfo());
+  mockDraftMode.mockReset();
+  mockDraftMode.mockResolvedValue({ isEnabled: false });
 });
 
 const buildProps = (category: string, pinId: string, slug: string) => ({
@@ -171,7 +184,7 @@ describe("ArticlePage", () => {
 
     render(await ArticlePage(buildProps("sleep", "pin002", "wind-down-routine")));
 
-    expect(mockGetByRoute).toHaveBeenCalledWith(ROUTE_REF);
+    expect(mockGetByRoute).toHaveBeenCalledWith(ROUTE_REF, { draft: false });
     expect(
       screen.getByRole("heading", { name: "A Wind-Down Routine" }),
     ).toBeInTheDocument();
@@ -217,5 +230,14 @@ describe("ArticlePage", () => {
     ).rejects.toThrow("NEXT_NOT_FOUND");
 
     expect(mockNotFound).toHaveBeenCalled();
+  });
+
+  it("requests the draft version and mounts the live-preview listener when Draft Mode is on", async () => {
+    mockDraftMode.mockResolvedValue({ isEnabled: true });
+    mockGetByRoute.mockResolvedValue(buildArticle());
+
+    render(await ArticlePage(buildProps("sleep", "pin002", "wind-down-routine")));
+
+    expect(mockGetByRoute).toHaveBeenCalledWith(ROUTE_REF, { draft: true });
   });
 });

@@ -389,6 +389,32 @@ importer generally: AI-generated marketing HTML routinely ships placeholder href
 a page builder, not a single rich-text field — anything user-facing here needs to degrade instead of
 throwing when the source content is malformed in ways a real editor never would produce.
 
+**Incident, 2026-09-18 — a Neon console rollback while debugging PR #25 wiped live content.**
+Opening the buy-button PR's Vercel Preview link touched the same single Neon `production` branch
+every environment shared (the "QA-only, revisit later" call from §2.1/the deploy checklist) — a
+manual restore to ~22:30 aimed at fixing what that Preview visit seemed to break instead rolled the
+*real* production branch backward, taking the `buyButtonLabel` column (added by #24, which is why
+PR #25's CI build then failed with `column articles.buy_button_label does not exist`), the wife's
+most recent article, and the current `SiteInfo` banner with it.
+
+Recovered without data loss because Neon's console restore doesn't delete the pre-restore state —
+it preserves it as a separate branch (`production_old_<timestamp>`) before resetting the target.
+Confirmed directly against both branches before touching anything (row counts, `buy_button_label`
+presence, `max(updated_at)` per table) that the pre-rollback branch was a strict superset of the
+rolled-back one and that nothing had been written to the rolled-back branch since the mistake — so
+nothing was lost by preferring it. Fix: renamed the broken branch aside (kept, not deleted) and
+promoted the preserved branch back to `production`, rather than trying to force Neon to reset the
+original branch onto a fresh snapshot — an in-place restore-by-snapshot needs a manual snapshot
+first and this account's plan caps manual snapshots at one, so it wasn't worth the extra motion.
+
+Root cause was architectural, not a one-off mistake: with only one database, *any* write from
+*any* environment (a Preview visit, a local seed script, a console restore) shares blast radius
+with the live site. Fixed by finally doing the split the deploy checklist had deferred: created a
+`development` branch off the recovered `production`, now the exclusive `DATABASE_URI` for local
+dev, CI (`CI_DATABASE_URI`), and Vercel Preview/Development — `production` is Vercel Production
+only, from here on. See `docs/vercel-deploy-checklist.md`'s "Databases are now split" note for the
+operational rules this implies (schema pushes now need doing twice, once per branch).
+
 ---
 
 ## 2. Open decisions requiring approval

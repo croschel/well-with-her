@@ -43,7 +43,12 @@ export const Articles: CollectionConfig = {
     useAsTitle: "title",
     defaultColumns: ["title", "category", "pinId", "publishedAt"],
     livePreview: {
-      url: ({ data }) => `${SITE_URL}/${data.category}/${data.pinId}/${data.slug}`,
+      // Routed through /api/draft (not straight at the article URL) so the
+      // iframe's first load enables Next's Draft Mode — otherwise it just
+      // shows the same statically-cached, published-only page a visitor
+      // sees, with no way to reflect unsaved or unpublished changes.
+      url: ({ data }) =>
+        `${SITE_URL}/api/draft?category=${data.category}&pinId=${data.pinId}&slug=${data.slug}`,
     },
   },
   endpoints: [
