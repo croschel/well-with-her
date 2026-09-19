@@ -2,35 +2,52 @@ import { getPayload } from "payload";
 
 import config from "../payload.config";
 
-const richText = (text: string) => ({
+const richTextParagraphs = (paragraphs: string[]) => ({
   root: {
     type: "root",
     format: "" as const,
     indent: 0,
     version: 1,
     direction: null,
-    children: [
-      {
-        type: "paragraph",
-        format: "" as const,
-        indent: 0,
-        version: 1,
-        direction: null,
-        children: [
-          {
-            type: "text",
-            format: 0,
-            detail: 0,
-            mode: "normal",
-            style: "",
-            version: 1,
-            text,
-          },
-        ],
-      },
-    ],
+    children: paragraphs.map((text) => ({
+      type: "paragraph",
+      format: "" as const,
+      indent: 0,
+      version: 1,
+      direction: null,
+      children: [
+        {
+          type: "text",
+          format: 0,
+          detail: 0,
+          mode: "normal",
+          style: "",
+          version: 1,
+          text,
+        },
+      ],
+    })),
   },
 });
+
+const richText = (text: string) => richTextParagraphs([text]);
+
+const PRIVACY_POLICY_CONTENT = richTextParagraphs([
+  "Effective date: September 2026. This Privacy Policy explains what information WellWithHer (\"we\", \"us\") collects from visitors to this site, and how it's used.",
+  "Analytics: we use Google Analytics (GA4) and the Pinterest Tag to understand which content resonates with our readers — for example, which pages are viewed and which links are clicked. These tools may set cookies and collect information such as your IP address, browser type, and pages visited. We do not use this data to identify you personally.",
+  "Contact form: if you use our contact form, we collect the name, email address, and message you submit. This information is stored securely and is only accessible to our editorial team — we do not sell or share it with third parties, and we do not use it for marketing unless you separately opt in.",
+  "Accounts and newsletter: WellWithHer does not currently offer visitor accounts or a newsletter. The only login on this site is for our internal editorial team.",
+  "Cookies: aside from any cookies set by the analytics tools described above, we do not currently use tracking cookies. If this changes, we will update this policy and provide a way to manage your cookie preferences.",
+  "Affiliate links: some articles contain affiliate links, meaning we may earn a commission if you make a purchase through them, at no extra cost to you. See our Affiliate Disclosure page for details.",
+  "Questions about this policy? Reach out through our Contact page.",
+]);
+
+const AFFILIATE_DISCLOSURE_CONTENT = richTextParagraphs([
+  "WellWithHer participates in affiliate marketing. This means that some of the products we recommend in our articles — including the \"buy this pick\" buttons — contain affiliate links.",
+  "If you click one of these links and make a purchase, we may earn a commission at no additional cost to you. We only recommend products we genuinely believe can help our readers.",
+  "In line with the Federal Trade Commission's guidance on endorsements, a short version of this disclosure is also shown directly above the buy button on every article that contains an affiliate link, so the relationship is clear right where the recommendation appears — not just here.",
+  "If you have questions about a specific recommendation, feel free to reach out through our Contact page.",
+]);
 
 const SAMPLE_ARTICLES = [
   {
@@ -111,6 +128,8 @@ const run = async () => {
       ),
       disclosure:
         "Some links on this site are affiliate links. We may earn a commission at no extra cost to you.",
+      privacyPolicyContent: PRIVACY_POLICY_CONTENT,
+      affiliateDisclosureContent: AFFILIATE_DISCLOSURE_CONTENT,
     },
   });
 

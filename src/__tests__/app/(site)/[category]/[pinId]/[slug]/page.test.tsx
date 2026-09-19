@@ -66,6 +66,8 @@ const buildArticle = (overrides: Partial<Article> = {}): Article => ({
 const buildSiteInfo = (): SiteInfo => ({
   asideContent: { root: { type: "root", children: [] } },
   disclosure: "Some links may be affiliate links.",
+  privacyPolicyContent: { root: {} },
+  affiliateDisclosureContent: { root: {} },
 });
 
 beforeEach(() => {
@@ -187,6 +189,9 @@ describe("ArticlePage", () => {
       screen.getByRole("heading", { name: "A Wind-Down Routine" }),
     ).toBeInTheDocument();
     expect(screen.getByText("About WellWithHer")).toBeInTheDocument();
+    expect(
+      screen.getByText("Some links may be affiliate links."),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Shop this pick →" }),
     ).toHaveAttribute("href", "https://example.com/shop");

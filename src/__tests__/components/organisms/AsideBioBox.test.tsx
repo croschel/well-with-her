@@ -35,6 +35,8 @@ const buildSiteInfo = (overrides: Partial<SiteInfo> = {}): SiteInfo => ({
     },
   },
   disclosure: "Some links may be affiliate links.",
+  privacyPolicyContent: { root: {} },
+  affiliateDisclosureContent: { root: {} },
   ...overrides,
 });
 
