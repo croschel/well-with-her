@@ -42,9 +42,30 @@ Preview, Development) unless noted otherwise.
 | `PINTEREST_DOMAIN_VERIFY_CODE` | Leave blank | Only needed once a real Pinterest business account is connected |
 | `NEXT_PUBLIC_GA4_MEASUREMENT_ID` | GA4 measurement ID once GA4 is set up (blank until then) | GA4 loads directly from the site, not through GTM. Do **not** also add a GA4 config tag in the GTM container while this is set, or every page view is counted twice |
 | `NEXT_PUBLIC_PINTEREST_TAG_ID` | **Leave blank in production** | The Pinterest tag (ID `2613820112424`) runs through GTM using the "Pinterest Tag" template. Setting this too would double-fire Pinterest |
-| `NEXT_PUBLIC_GTM_ID` | `GTM-TB5X9RG2` | Google Tag Manager container; loaded on the public site only, never `/admin`. Inlined at build time, so redeploy after changing it. Blank = GTM not loaded |
+| `NEXT_PUBLIC_GTM_ID` | `GTM-TB5X9RG2`, **but only once the cookie consent banner has shipped** and the GTM-side setup below is tested | Google Tag Manager container; loaded on the public site only, never `/admin`. Inlined at build time, so redeploy after changing it. Blank = GTM not loaded. Keep it unset until consent ships, or the Pinterest tag would fire without consent |
 
 Generate a random secret however you like — e.g. `openssl rand -base64 32` in a terminal.
+
+### GTM-side setup for consent (do this before setting `NEXT_PUBLIC_GTM_ID`)
+
+The site now asks visitors for consent and tells Google Tag Manager their answer. GTM has to be set
+up to listen. In plain terms:
+
+1. In the GTM container, open **Admin -> Container Settings** and tick **Enable consent overview**.
+2. Open the **Pinterest Tag**, then **Advanced Settings -> Consent Settings**. Choose **Require
+   additional consent for tag to fire** and add `ad_storage`. (The official Pinterest template has no
+   built-in consent handling, so this is what keeps it quiet until the visitor agrees to advertising.)
+3. On the same tag, add a second **trigger**: type **Custom Event**, event name
+   `cookie_consent_update`. This makes the tag fire right after someone clicks Accept, not only on the
+   next page.
+4. Do **not** add a GA4 tag in GTM. GA4 loads directly from the site and already respects consent;
+   a second one would double count.
+5. Click **Preview** in GTM and open the site. Check: before you click anything, consent shows
+   **denied** and the Pinterest tag does not fire. After **Accept all**, consent shows granted and the
+   Pinterest tag fires. After **Reject all** (clear site data first), nothing fires.
+6. In GA4, open **Admin -> DebugView** while previewing to confirm events arrive after Accept all.
+7. Only when all of that looks right, **Publish** the GTM container, then set `NEXT_PUBLIC_GTM_ID` in
+   Vercel and redeploy.
 
 ## 3. First deploy, then set the real site URL
 
