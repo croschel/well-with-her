@@ -81,6 +81,10 @@ prompt contains an approved plan (and any changes the owner requested).
 - **Never mark a ticket Done** before the user confirms the PR is merged.
 - Commits end with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
 - PR bodies end with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
+- **Use the `croschel` GitHub account.** Run `gh auth status` before pushing or opening a PR; if
+  the active account is not `croschel` (e.g. the work `caique-roschel_domo` account), stop and
+  return that as a blocker. Do not switch accounts yourself and do not borrow a token with
+  `GH_TOKEN=$(gh auth token --user ...)`.
 - **Ask before outward-facing actions** not covered by the approved plan (extra PRs, comments,
   deploys, new third-party accounts or services, anything that emails or posts). Since you cannot
   ask mid-run, stop and return the question.

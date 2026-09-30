@@ -88,6 +88,19 @@ and commit it separately as the last commit before pushing.
 
 ## 7. Push and open the PR
 
+This repo (`croschel/well-with-her`) belongs to the personal **`croschel`** GitHub account. The
+machine also has a work Enterprise Managed User account (`caique-roschel_domo`) logged in, and
+when that one is active `gh pr create` fails with "Enterprise Managed User ... cannot access this
+content". Check before pushing, and switch if needed:
+
+```bash
+gh auth status                # the active account must be croschel
+gh auth switch -u croschel    # if it isn't
+```
+
+Never work around a wrong active account by passing `GH_TOKEN=$(gh auth token --user ...)` — switch
+the account properly, or stop and ask.
+
 ```bash
 git push -u origin feat/<slug>
 gh pr create --title "..." --body "$(cat <<'EOF'
