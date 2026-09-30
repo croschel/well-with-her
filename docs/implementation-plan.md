@@ -415,6 +415,27 @@ dev, CI (`CI_DATABASE_URI`), and Vercel Preview/Development — `production` is 
 only, from here on. See `docs/vercel-deploy-checklist.md`'s "Databases are now split" note for the
 operational rules this implies (schema pushes now need doing twice, once per branch).
 
+**Discovered in Ticket 16 (GTM + Pinterest tag):**
+- Added `@next/third-parties` (16.3.7; peers `next ^16.0.0-beta.0`, `react ^19`) for `GoogleTagManager`
+  and `sendGTMEvent`. Verified against the installed source: `sendGTMEvent` only does
+  `window.dataLayer = window.dataLayer || []; push(data)`, so `useAnalytics` needs no guard when GTM
+  isn't loaded. The GTM component and its noscript fallback (`GtmNoScript`, first child of `<body>`)
+  are env-gated on `NEXT_PUBLIC_GTM_ID` and only in the `(site)` layout, so `/admin` never loads them.
+- Tag split (owner decision): GA4 stays as the direct gtag script; Pinterest (tag ID
+  `2613820112424`) runs through GTM's "Pinterest Tag" template. `AnalyticsScripts` keeps its
+  Pinterest branch, but `NEXT_PUBLIC_PINTEREST_TAG_ID` must stay unset in production or Pinterest
+  double-fires; likewise the GTM container must not get its own GA4 config tag while the direct GA4
+  script is on. Pinterest Enhanced Match (hashed email) is deliberately not implemented — no email
+  is collected on public pages.
+- `useAnalytics.trackPageView` now also pushes `{ event: "utm_page_view", ...utmParams }` for GTM
+  triggers/variables.
+- React's client renderer never mounts `<noscript>` children, so `GtmNoScript`'s test asserts on
+  `renderToStaticMarkup` output instead of the RTL container.
+- Manual follow-ups: set `NEXT_PUBLIC_GTM_ID=GTM-TB5X9RG2` in Vercel (build-time inlined, redeploy);
+  configure the Pinterest tag inside GTM; update the live privacy policy `SiteInfo` content in
+  `/admin` on dev and production (the seed only changes `scripts/seed.ts`); a consent banner is a
+  separate ticket.
+
 ---
 
 ## 2. Open decisions requiring approval
