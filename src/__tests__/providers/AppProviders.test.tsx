@@ -13,4 +13,17 @@ describe("AppProviders", () => {
 
     expect(screen.getByText("child content")).toBeInTheDocument();
   });
+
+  it("mounts the cookie consent banner alongside the children", async () => {
+    localStorage.clear();
+    render(
+      <AppProviders>
+        <p>child content</p>
+      </AppProviders>,
+    );
+
+    expect(
+      await screen.findByRole("region", { name: "Cookie consent" }),
+    ).toBeInTheDocument();
+  });
 });
