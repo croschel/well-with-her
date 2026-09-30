@@ -42,7 +42,7 @@ git checkout -b feat/<slug>
 **Always branch before writing any code.** This project has twice accidentally committed straight
 to `main` mid-session — both times caught and fixed only because nothing had been pushed yet
 (`git branch <name>` to save the commit, `git branch -f main origin/main` to rewind). If a commit
-ever lands on `main` by mistake, fix it the same way *before* pushing, not after.
+ever lands on `main` by mistake, fix it the same way _before_ pushing, not after.
 
 ## 3. Implement, verifying against the real thing as you go
 
@@ -73,7 +73,7 @@ rather than accepting "good enough."
 
 Not one giant commit — split by concern (e.g. "shared building blocks" → "the organism that wires
 them together" → "the route page" was one ticket's real 3-commit sequence). Each commit message
-explains *why*, not just what changed; end every commit with:
+explains _why_, not just what changed; end every commit with:
 
 ```
 Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
@@ -87,6 +87,19 @@ Ticket N" section to `docs/implementation-plan.md` (see the existing ones for th
 and commit it separately as the last commit before pushing.
 
 ## 7. Push and open the PR
+
+This repo (`croschel/well-with-her`) belongs to the personal **`croschel`** GitHub account. The
+machine also has a work Enterprise Managed User account (`caique-roschel_domo`) logged in, and
+when that one is active `gh pr create` fails with "Enterprise Managed User ... cannot access this
+content". Check before pushing, and switch if needed:
+
+```bash
+gh auth status                # the active account must be croschel
+gh auth switch -u croschel    # if it isn't
+```
+
+Never work around a wrong active account by passing `GH_TOKEN=$(gh auth token --user ...)` — switch
+the account properly, or stop and ask.
 
 ```bash
 git push -u origin feat/<slug>
@@ -123,7 +136,7 @@ gh run watch <run-id> --exit-status
 
 ## 8. Update the Notion ticket tracker
 
-Mark the ticket **In progress** with its branch name at the *start* of work (before step 2, really)
+Mark the ticket **In progress** with its branch name at the _start_ of work (before step 2, really)
 and add the PR link + a one-line note once opened. Don't mark **Done** until the user confirms the
 PR is merged.
 
@@ -132,3 +145,27 @@ PR is merged.
 Don't start the next ticket until the user explicitly confirms this one merged. On confirmation,
 go back to step 1 — sync, clean up, and mark this ticket **Done** in Notion before branching for
 the next one.
+
+## Parallel tickets with worktrees
+
+Step 1 assumes one checkout. When several tickets are in flight at once, give each its own git
+worktree so branch switches and uncommitted files never leak between them (the
+`wellwithher-feature` agent does this in its Phase B). The rest of the steps run unchanged inside
+the worktree.
+
+```bash
+# from the main checkout
+git fetch origin
+git worktree add ../wellwithher-worktrees/<slug> -b feat/<slug> origin/main
+cd ../wellwithher-worktrees/<slug>
+ln -s ../../wellwithher/node_modules node_modules   # share deps instead of reinstalling
+cp ../../wellwithher/.env .env                       # gitignored; points at the dev Neon branch
+```
+
+After the PR is merged (and the user has confirmed it), clean up from the main checkout:
+
+```bash
+git worktree remove ../wellwithher-worktrees/<slug>   # add --force if only the symlink/.env remain untracked
+git branch -D feat/<slug>                              # squash merges aren't seen by `branch -d`
+git worktree prune
+```
