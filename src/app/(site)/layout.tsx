@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { AnalyticsScripts } from "@/components/organisms/AnalyticsScripts";
+import { GtmNoScript } from "@/components/organisms/GtmNoScript";
+import { GtmScripts } from "@/components/organisms/GtmScripts";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
 import { SiteHeader } from "@/components/organisms/SiteHeader";
 import { UtmTracker } from "@/components/organisms/UtmTracker";
@@ -33,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${playfairDisplay.variable} ${jost.variable} ${parisienne.variable}`}
     >
       <body>
+        <GtmNoScript />
         <AppProviders>
           <Suspense fallback={null}>
             <UtmTracker />
@@ -48,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </Box>
         </AppProviders>
         <AnalyticsScripts />
+        <GtmScripts />
       </body>
     </html>
   );

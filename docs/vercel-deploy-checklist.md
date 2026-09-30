@@ -40,8 +40,9 @@ Preview, Development) unless noted otherwise.
 | `BLOB_READ_WRITE_TOKEN` | Don't set manually | Add the **Vercel Blob** storage integration to this project first (Storage tab → Create → Blob) — it injects this automatically |
 | `NEXT_PUBLIC_SITE_URL` | Leave blank for the very first deploy, come back after (see §3) | Needed for canonical URLs, OG tags, and JSON-LD to resolve correctly |
 | `PINTEREST_DOMAIN_VERIFY_CODE` | Leave blank | Only needed once a real Pinterest business account is connected |
-| `NEXT_PUBLIC_GA4_MEASUREMENT_ID` | Leave blank | Only needed once GA4 is actually set up |
-| `NEXT_PUBLIC_PINTEREST_TAG_ID` | Leave blank | Only needed once the Pinterest conversion tag is actually set up |
+| `NEXT_PUBLIC_GA4_MEASUREMENT_ID` | GA4 measurement ID once GA4 is set up (blank until then) | GA4 loads directly from the site, not through GTM. Do **not** also add a GA4 config tag in the GTM container while this is set, or every page view is counted twice |
+| `NEXT_PUBLIC_PINTEREST_TAG_ID` | **Leave blank in production** | The Pinterest tag (ID `2613820112424`) runs through GTM using the "Pinterest Tag" template. Setting this too would double-fire Pinterest |
+| `NEXT_PUBLIC_GTM_ID` | `GTM-TB5X9RG2` | Google Tag Manager container; loaded on the public site only, never `/admin`. Inlined at build time, so redeploy after changing it. Blank = GTM not loaded |
 
 Generate a random secret however you like — e.g. `openssl rand -base64 32` in a terminal.
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { sendGTMEvent } from "@next/third-parties/google";
 import { useCallback } from "react";
 
 import type { UtmParams } from "@/utils/utm";
@@ -15,6 +16,8 @@ export interface UseAnalyticsResult {
   trackPageView: (utmParams: UtmParams) => void;
 }
 
+// sendGTMEvent just pushes onto window.dataLayer (creating it if needed), so
+// it is safe when GTM isn't loaded — events queue up harmlessly.
 // gtag/pintrk are only defined when AnalyticsScripts actually loaded them
 // (i.e. the corresponding env var is set) — the `?.` calls are load-bearing,
 // not defensive filler, on every environment without real IDs configured.
@@ -22,6 +25,7 @@ export const useAnalytics = (): UseAnalyticsResult => {
   const trackPageView = useCallback((utmParams: UtmParams) => {
     window.gtag?.("event", "page_view", utmParams);
     window.pintrk?.("track", "pagevisit", utmParams);
+    sendGTMEvent({ event: "utm_page_view", ...utmParams });
   }, []);
 
   return { trackPageView };
