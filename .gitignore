@@ -44,3 +44,7 @@ next-env.d.ts
 
 # Payload local media storage (Vercel Blob fallback when unset)
 /media
+
+# Local tooling state
+.headroom/
+.serena/
