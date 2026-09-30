@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { AnalyticsScripts } from "@/components/organisms/AnalyticsScripts";
+import { ConsentDefaults } from "@/components/organisms/ConsentDefaults";
 import { GtmNoScript } from "@/components/organisms/GtmNoScript";
 import { GtmScripts } from "@/components/organisms/GtmScripts";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${playfairDisplay.variable} ${jost.variable} ${parisienne.variable}`}
     >
       <body>
+        <ConsentDefaults />
         <GtmNoScript />
         <AppProviders>
           <Suspense fallback={null}>

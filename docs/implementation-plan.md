@@ -436,6 +436,37 @@ operational rules this implies (schema pushes now need doing twice, once per bra
   `/admin` on dev and production (the seed only changes `scripts/seed.ts`); a consent banner is a
   separate ticket.
 
+**Discovered in Ticket 17 (cookie consent, Consent Mode v2):**
+- Owner decisions: everyone sees the banner and consent defaults to denied (no geolocation, no
+  `proxy.ts`, no `cookies()`/`headers()` in layouts, so routes stay static). Advanced Consent Mode:
+  GA4 (direct gtag) and GTM load immediately and respect the state; GA4 sends cookieless pings while
+  denied. Two categories: Analytics -> `analytics_storage`; Advertising -> `ad_storage`,
+  `ad_user_data`, `ad_personalization` together, plus a locked "strictly necessary" row.
+  `ads_data_redaction: true`, `url_passthrough: false`.
+- State lives in `localStorage` key `whh_consent` as `{version, analytics, advertising, decidedAt}`;
+  a different `version` or an age over 12 months counts as undecided. Nothing is server-side.
+- The bootstrap is `ConsentDefaults`, a `next/script` `beforeInteractive` inline script in the
+  `(site)` root layout (per the Next docs these scripts are injected in the initial HTML and run in
+  order, ahead of the `afterInteractive` GTM and GA4 scripts). It pushes `arguments` objects through
+  `gtag()`: Google's libraries ignore plain objects in `dataLayer` for consent commands, which is why
+  the `GoogleTagManager` `dataLayer` prop was not used. It restores a stored choice synchronously so
+  returning visitors are never briefly denied. Its validity check duplicates `parseStoredConsent`
+  (it runs before any bundle) and a test asserts the two agree.
+- `setConsent` pushes both `gtag('consent','update',...)` and `{event: 'cookie_consent_update'}`;
+  GTM needs the event to re-fire tags that were blocked on first load.
+- The store's server snapshot is `undefined` ("unknown"), distinct from `null` ("undecided"), and
+  `useConsent().isReady` is false until mount, so the banner never appears in server HTML and cannot
+  cause a hydration mismatch or layout shift (it is fixed-position).
+- Global Privacy Control: with no stored choice nothing is granted anyway, so GPC needs no extra
+  bootstrap logic; the dialog notes the signal and its Advertising switch starts off. An explicit
+  click (Accept all or flipping the switch) is treated as the visitor's own choice and wins.
+- `@next/third-parties` was declared but missing from the shared `node_modules` in the worktree
+  until `npm ci` was run in the main checkout; run `npm ci` after pulling dependency changes.
+- Manual follow-ups: edit the live privacy policy content in `/admin` on dev and production (the seed
+  only changes `scripts/seed.ts`); the GTM-side setup in `docs/vercel-deploy-checklist.md`; keep
+  `NEXT_PUBLIC_GTM_ID` unset in Vercel until this ships and the GTM Preview test passes. This is not
+  legal advice.
+
 ---
 
 ## 2. Open decisions requiring approval
@@ -1264,10 +1295,12 @@ The article page is the money page and it's mostly images plus a possible video 
 one-time Lighthouse pass in Ticket 12 with a target of LCP < 2.5s on 4G mobile — which is where
 Pinterest traffic actually comes from. The click-to-load video wrapper (§2.4) exists mainly for this.
 
-**10. Cookie consent — only if the traffic warrants it.**
-GA4 plus the Pinterest tag both set cookies. If meaningful EU/UK traffic shows up, a consent banner
-becomes a legal requirement. Don't build it now; check Analytics geography a month after launch and
-decide then.
+**10. Cookie consent — ✅ built (Ticket 17).**
+GA4 plus the Pinterest tag both set cookies. Originally deferred until EU/UK traffic justified it;
+the owner chose to show one banner to every visitor instead (no geolocation, routes stay static).
+Google Consent Mode v2 "advanced" mode, two categories (Analytics, Advertising), Global Privacy
+Control honored, choice stored in `localStorage` and re-asked after 12 months or a version bump.
+See "Discovered in Ticket 17" above.
 
 ---
 

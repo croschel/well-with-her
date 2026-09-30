@@ -35,6 +35,14 @@ describe("SiteFooter", () => {
     expect(screen.queryByRole("link", { name: "Pinterest" })).toBeNull();
   });
 
+  it("renders a Cookie settings control in the Company column", () => {
+    render(<SiteFooter />);
+
+    expect(
+      screen.getByRole("button", { name: "Cookie settings" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders the current year in the copyright line", () => {
     render(<SiteFooter />);
 

@@ -1,5 +1,6 @@
 import { Box, Container, Grid, Stack, Typography } from "@mui/material";
 
+import { CookieSettingsLink } from "@/components/atoms/CookieSettingsLink";
 import { NextLink } from "@/components/atoms/NextLink";
 import { CATEGORY_LABELS } from "@/constants/category";
 import { ROUTES } from "@/constants/routes";
@@ -113,6 +114,7 @@ export const SiteFooter = () => (
             >
               {AFFILIATE_DISCLOSURE_LABEL}
             </Typography>
+            <CookieSettingsLink />
           </Stack>
         </Grid>
 

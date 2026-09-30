@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { ReactNode } from "react";
 
+import { CookieConsentBanner } from "@/components/organisms/CookieConsentBanner";
 import { theme } from "@/theme";
 
 export interface AppProvidersProps {
@@ -15,6 +16,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       {children}
+      <CookieConsentBanner />
     </ThemeProvider>
   </AppRouterCacheProvider>
 );
