@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
-import { renderToString } from "react-dom/server";
 import { createElement } from "react";
+import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OPEN_CONSENT_EVENT } from "@/constants/consent";

@@ -81,7 +81,7 @@ describe("consentStore", () => {
       advertising: false,
     });
     expect(
-      JSON.parse(localStorage.getItem(CONSENT_STORAGE_KEY) as string),
+      JSON.parse(localStorage.getItem(CONSENT_STORAGE_KEY)!),
     ).toMatchObject({ analytics: true, advertising: false });
     expect(listener).toHaveBeenCalledTimes(1);
   });
