@@ -41,6 +41,48 @@ teaches Hostinger + WordPress, so she can follow it directly.
   only the design needs rolling back. Posts, media, the legal pages and the Complianz settings are
   only in Hostinger's backups.
 
+## Architecture
+
+Measured on 2026-10-10 (HTTP headers, WordPress REST API, Site Health, hPanel).
+
+```
+Visitor (Pinterest / Google)
+  → DNS: <site>.hostingersite.com → free.cdn.hstgr.net
+  → Hostinger CDN ("hcdn" edge servers)
+  → shared Hostinger server: LiteSpeed web server + LiteSpeed Cache
+      ├─ PHP 8.3 → WordPress 7.1.3 (Hostinger AI theme 2.1.13)
+      ├─ MySQL (Hostinger-managed, same account) ≈ 5 MB
+      └─ disk: wp-content/uploads (media + self-hosted fonts)
+```
+
+| Layer      | What it is                                                        | Notes                                                                                                            |
+| ---------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Hosting    | "Unlimited Web Hosting", shared server                            | 0.89 / 50 GB disk, 23K / 600K inodes, 1 / 1000 sites; ~1% CPU over 24 h. glibc 2.28 (why Next.js can't run here) |
+| Web server | LiteSpeed + LiteSpeed Cache plugin                                | Pages are served from the page cache (`x-litespeed-cache: hit`)                                                  |
+| CDN        | Hostinger CDN, included in the plan                               | Pages `max-age=604800` (7 d), media `max-age=31536000` (1 y)                                                     |
+| App        | WordPress 7.1.3, PHP 8.3, Gutenberg                               | Design is global styles + templates in the database, no theme files edited                                       |
+| Database   | Hostinger MySQL                                                   | Replaces Neon for this site                                                                                      |
+| Backups    | Hostinger daily backups (whole site) + design copies in `backup/` |                                                                                                                  |
+
+**Media.** Stored on the server's disk under `wp-content/uploads/<year>/<month>/` — no external
+bucket (the Vercel Blob is only used by the old Next.js site). 40 images, all PNG/JPEG. WordPress
+generates 7 extra sizes per upload (thumbnail, medium, medium_large, large, 1536×1536 and the
+theme's `blog-thumb`/`blog-full`), so 81 MB of originals take 168 MB on disk. Pages use
+`srcset`, so browsers pick a size for their screen; delivery goes through the Hostinger CDN.
+
+**Known weak spot: image weight.** The imported images are PNG at 1.5–2.5 MB each, and no WebP is
+served (a request with `Accept: image/webp` still gets the 2.46 MB PNG). In one test the CDN
+bypassed the cache for a full-size image (`x-hcdn-cache-status: BYPASS`) and the origin took ~5 s to
+respond. Converting to WebP/compressing is the main performance fix (open item 10).
+
+|               | Before (Next.js)                   | Now (WordPress)             |
+| ------------- | ---------------------------------- | --------------------------- |
+| App           | Next.js 16 + Payload CMS on Vercel | WordPress on Hostinger      |
+| Database      | Neon Postgres (external)           | MySQL on the same account   |
+| Media         | Vercel Blob (external)             | Server disk + Hostinger CDN |
+| Caching       | ISR + on-demand revalidation       | LiteSpeed Cache + CDN       |
+| Maintained by | A developer                        | The wife, from wp-admin     |
+
 ## What the AI builder got wrong
 
 The Hostinger AI builder takes 2000-character prompts (the prompts used are in
@@ -159,9 +201,12 @@ All 11 published articles from production were imported as WordPress posts, with
 
 ### Old → new article URLs
 
-Existing Pinterest pins point at the Next.js URLs. They keep working while the Vercel site is up;
-before Vercel is shut down or the domain moves to WordPress, each old URL needs a 301 to its new
-one (e.g. with the free Redirection plugin).
+Existing Pinterest pins point at the Next.js URLs. They keep working while the Vercel site is up.
+**Decision (2026-10-10): no 301 redirects.** Once the domain is attached to WordPress, the wife
+edits each pin's destination link by hand (her guide has this table with a direct link to each
+pin — the stored `pinId` is the Pinterest pin ID). Vercel must stay up until every pin is updated.
+Trade-off accepted: copies of the old URLs elsewhere (search results, shared links) break when
+Vercel goes away.
 
 | Old URL (Next.js)                                                    | New URL (WordPress)                 |
 | -------------------------------------------------------------------- | ----------------------------------- |
@@ -190,14 +235,22 @@ one (e.g. with the free Redirection plugin).
 5. **Analytics:** create the GTM container, add its ID in Complianz → Wizard → Statistics
    configuration (Complianz then injects GTM, blocked until consent), and set the GA4 and Pinterest
    tags in GTM to fire only on consent.
-6. **Domain and redirects:** attach the real domain, then add 301s for the old article URLs (table
-   above). Pins already point at those URLs, so this has to happen before Vercel goes away. Posts
-   currently use `/%postname%/` permalinks; if that changes, update the table's targets.
+6. **Domain, then pins:** attach the free domain through hPanel (confirm it shows as R$ 0 at
+   checkout — the free-domain offer wasn't visible in the account when checked), then update each
+   pin's link (table above), then retire Vercel. Posts use `/%postname%/` permalinks; if that
+   changes, update the table's targets.
 7. **Wife's account:** give her the **Editor** role, not Administrator.
 8. **AI-builder leftovers:** the two sample "Wellness tech" posts are in the trash (auto-emptied
    after 30 days); their featured images (media 97, 98) were deleted.
-9. **Confirm Hostinger's daily backups** are actually enabled and restorable in hPanel → Backups
-   (not checked yet).
+9. **Confirm Hostinger's daily backups** are restorable: hPanel lists backups as "Daily", but no
+   restore has been tried.
+10. **Image weight:** media is PNG at 1.5–2.5 MB per file (see Architecture). LiteSpeed's image
+    optimization needs the site registered with QUIC.cloud (external service, sends images out
+    for processing); not connected yet, pending a decision.
+11. **Site Health recommendations** (none critical): remove the unused default themes
+    (Twenty Twenty-Three/Four; keep Twenty Twenty-Five as a fallback); a failed
+    `action_scheduler_run_queue` cron run (typical of WP-Cron on a low-traffic site; recheck
+    later); no persistent object cache (not needed at this traffic).
 
 ## Restoring
 
