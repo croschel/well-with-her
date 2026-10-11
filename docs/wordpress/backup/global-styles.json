@@ -1,0 +1,135 @@
+{
+  "settings": {
+    "color": {
+      "palette": {
+        "custom": [
+          {
+            "name": "Sage",
+            "slug": "wwh-sage",
+            "color": "#8a9678"
+          },
+          {
+            "name": "Sage dark",
+            "slug": "wwh-sage-dark",
+            "color": "#7c8a63"
+          },
+          {
+            "name": "Taupe",
+            "slug": "wwh-taupe",
+            "color": "#9c8f78"
+          },
+          {
+            "name": "Ink",
+            "slug": "wwh-ink",
+            "color": "#4a3222"
+          },
+          {
+            "name": "Body text",
+            "slug": "wwh-body",
+            "color": "#6b5c4a"
+          },
+          {
+            "name": "Cream",
+            "slug": "wwh-cream",
+            "color": "#f8f2ea"
+          },
+          {
+            "name": "Card cream",
+            "slug": "wwh-card",
+            "color": "#fffaf3"
+          },
+          {
+            "name": "Footer beige",
+            "slug": "wwh-footer",
+            "color": "#efe4d2"
+          },
+          {
+            "name": "Border",
+            "slug": "wwh-border",
+            "color": "#d8cdb8"
+          }
+        ]
+      }
+    },
+    "typography": {
+      "fontFamilies": {
+        "custom": [
+          {
+            "name": "Jost",
+            "slug": "jost",
+            "fontFamily": "Jost, sans-serif",
+            "fontFace": [
+              {
+                "fontFamily": "Jost",
+                "fontWeight": "100 900",
+                "fontStyle": "normal",
+                "src": "https://palevioletred-hornet-247825.hostingersite.com/wp-content/uploads/fonts/jost.woff2"
+              }
+            ]
+          },
+          {
+            "name": "Parisienne",
+            "slug": "parisienne",
+            "fontFamily": "Parisienne, cursive",
+            "fontFace": [
+              {
+                "fontFamily": "Parisienne",
+                "fontWeight": "400",
+                "fontStyle": "normal",
+                "src": "https://palevioletred-hornet-247825.hostingersite.com/wp-content/uploads/fonts/parisienne.woff2"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#f8f2ea",
+      "text": "#4a3222"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--jost)"
+    },
+    "elements": {
+      "heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--playfairdisplay)",
+          "fontWeight": "600"
+        },
+        "color": {
+          "text": "#4a3222"
+        }
+      },
+      "link": {
+        "color": {
+          "text": "#4a3222"
+        }
+      },
+      "button": {
+        "color": {
+          "background": "#4a3222",
+          "text": "#f8f2ea"
+        },
+        "border": {
+          "radius": "24px"
+        },
+        "spacing": {
+          "padding": {
+            "top": "12px",
+            "bottom": "12px",
+            "left": "22px",
+            "right": "22px"
+          }
+        },
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--jost)",
+          "fontSize": "13px",
+          "fontWeight": "500",
+          "letterSpacing": "0.4px"
+        }
+      }
+    }
+  }
+}
