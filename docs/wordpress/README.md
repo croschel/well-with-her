@@ -120,6 +120,59 @@ Matches the consent model in `src/utils/consent.ts` and what the Privacy Policy 
   aren't needed at this size. Consent Mode V2 can be configured inside GTM itself when analytics is
   added.
 
+## Content import (2026-10-10)
+
+All 11 published articles from production were imported as WordPress posts, with their images.
+
+- **Source:** the production site's public Payload REST API
+  (`https://well-with-her-peach.vercel.app/api/articles?depth=1`), cross-checked against the Neon
+  `production` branch with read-only `SELECT`s (11 articles, 28 inline image blocks, 14 CTA
+  blocks). Nothing in Neon or Vercel was modified.
+- **Images:** downloaded by the browser straight from the Vercel Blob store's public URL
+  (`https://<store-id>.public.blob.vercel-storage.com/<file>`, which sends
+  `Access-Control-Allow-Origin: *`) and uploaded to the WordPress media library — 39 images, renamed
+  from "Imagem do Codex …" to `<post-slug>-hero.png` / `<post-slug>-<n>.png`, alt text preserved.
+  The Payload `/api/media/file/...` route can't be used for this: it sends no CORS origin header.
+  The pre-resized Payload sizes were used (`hero` 1600px for featured images, `gallery` 1200px for
+  inline images) rather than the multi-megabyte originals.
+- **Conversion:** each article's Lexical JSON was converted to native Gutenberg blocks, so
+  everything stays editable: headings, paragraphs, bold/italic, bullet lists, line breaks, images
+  (`core/image`), and links. CTA blocks became either a `wwh-buy` button or, for `style: link`, a
+  `wwh-cta-link` paragraph; both keep `rel="noopener sponsored"` and `target="_blank"`. The
+  end-of-article `buyButtonUrl`/`buyButtonLabel` became the same disclosure line + button as the
+  "Shop this pick" pattern.
+- **Kept:** original publish dates, categories (9 Women's Health, 1 Wellness, 1 Nutrition; Sleep is
+  empty in production too), and slugs, lowercased (`Saffron-isnt-just-Spice` →
+  `saffron-isnt-just-spice`).
+- **Not carried over:** `pinId` (WordPress URLs don't include it — see the redirect table below),
+  and `ogImage`/`ogDescription`, `galleryImages` and `videoEmbedUrl`, which are empty on every
+  production article.
+- **Hostinger bug found:** creating a post through the REST API with `featured_media` already set
+  returns a PHP fatal ("There has been a critical error on this website"), with any image. Creating
+  the post first and setting `featured_media` in a second request works. Likely one of the
+  Hostinger plugins hooking post creation; check whether the editor UI hits it too when the wife
+  publishes her first real post.
+
+### Old → new article URLs
+
+Existing Pinterest pins point at the Next.js URLs. They keep working while the Vercel site is up;
+before Vercel is shut down or the domain moves to WordPress, each old URL needs a 301 to its new
+one (e.g. with the free Redirection plugin).
+
+| Old URL (Next.js)                                                    | New URL (WordPress)                 |
+| -------------------------------------------------------------------- | ----------------------------------- |
+| `/womens-health/1099441327848405479/discover-the-simple-daily-habit` | `/discover-the-simple-daily-habit/` |
+| `/womens-health/1099441327851282256/Saffron-isnt-just-Spice`         | `/saffron-isnt-just-spice/`         |
+| `/womens-health/1099441327850937235/5-unexpected-habits`             | `/5-unexpected-habits/`             |
+| `/womens-health/1099441327851040287/5-daily-habits`                  | `/5-daily-habits/`                  |
+| `/womens-health/1099441327851526052/3-things-to-stop-doing`          | `/3-things-to-stop-doing/`          |
+| `/womens-health/1099441327851567417/5-morning-habits`                | `/5-morning-habits/`                |
+| `/womens-health/1099441327851917753/what-to-look-for`                | `/what-to-look-for/`                |
+| `/womens-health/1099441327851923829/microplastic-human-body`         | `/microplastic-human-body/`         |
+| `/wellness/1099441327852079987/why-do-i-get-bloated`                 | `/why-do-i-get-bloated/`            |
+| `/nutrition/1099441327852424457/6-low-fodmap-foods`                  | `/6-low-fodmap-foods/`              |
+| `/womens-health/1099441327852501955/how-often-should`                | `/how-often-should/`                |
+
 ## Open items
 
 1. **Footer "Cookie settings" link doesn't reopen the banner.** It uses the class
@@ -133,12 +186,12 @@ Matches the consent model in `src/utils/consent.ts` and what the Privacy Policy 
 5. **Analytics:** create the GTM container, add its ID in Complianz → Wizard → Statistics
    configuration (Complianz then injects GTM, blocked until consent), and set the GA4 and Pinterest
    tags in GTM to fire only on consent.
-6. **Domain:** attach the real domain, then set permalinks to `/%category%/%postname%/`. The old
-   `/[category]/[pinId]/[slug]` URL shape isn't reproduced — only worth custom rewrite code if pins
-   already point at old URLs.
+6. **Domain and redirects:** attach the real domain, then add 301s for the old article URLs (table
+   above). Pins already point at those URLs, so this has to happen before Vercel goes away. Posts
+   currently use `/%postname%/` permalinks; if that changes, update the table's targets.
 7. **Wife's account:** give her the **Editor** role, not Administrator.
-8. **Sample posts and images** from the AI builder (two "Wellness tech" posts, 530×250 images) are
-   placeholders to delete once real posts exist.
+8. **AI-builder leftovers:** the two sample "Wellness tech" posts are in the trash (auto-emptied
+   after 30 days); their 530×250 featured images (media 97, 98) are still in the media library.
 
 ## Restoring
 
