@@ -35,7 +35,11 @@ teaches Hostinger + WordPress, so she can follow it directly.
   builder and then restyled by hand. **Editor: Gutenberg**, not Elementor — Elementor's free tier
   can't template single posts (needs Pro, ~US$59/yr), it adds page weight that hurts mobile
   Pinterest traffic, and it's one more plugin to keep updated.
-- **Backups of everything customized:** `docs/wordpress/backup/` (see "Restoring" below).
+- **Backups:** Hostinger takes a daily backup of the whole site (files + database; hPanel →
+  Backups). Separately, every design customization is copied in `docs/wordpress/backup/` (see
+  "Restoring" below) — useful when a problem is noticed too late for the daily backups, or when
+  only the design needs rolling back. Posts, media, the legal pages and the Complianz settings are
+  only in Hostinger's backups.
 
 ## What the AI builder got wrong
 
@@ -191,7 +195,9 @@ one (e.g. with the free Redirection plugin).
    currently use `/%postname%/` permalinks; if that changes, update the table's targets.
 7. **Wife's account:** give her the **Editor** role, not Administrator.
 8. **AI-builder leftovers:** the two sample "Wellness tech" posts are in the trash (auto-emptied
-   after 30 days); their 530×250 featured images (media 97, 98) are still in the media library.
+   after 30 days); their featured images (media 97, 98) were deleted.
+9. **Confirm Hostinger's daily backups** are actually enabled and restorable in hPanel → Backups
+   (not checked yet).
 
 ## Restoring
 
@@ -199,8 +205,20 @@ If a theme update, a builder re-run, or an accidental edit wipes the customizati
 
 - **CSS:** paste `backup/global-styles.css` into Appearance → Editor → Styles → ⋮ → Additional CSS.
   (Global styles also keep revisions, under Styles → Revisions.)
+- **Palette, fonts, button style:** `backup/global-styles.json` is the user global-styles record
+  (`settings` + `styles`, without the CSS above). Restore it through the REST API from a logged-in
+  admin tab on the Site Editor:
+  `wp.apiFetch({path:'/wp/v2/global-styles/<id>', method:'POST', data:{settings, styles:{...styles, css}}})`
+  (the id is in `/wp/v2/themes?status=active` → `wp:user-global-styles`). The font files it points
+  at live in the font library (`wp-content/uploads/fonts/`); if they're gone, reinstall Jost and
+  Parisienne first via Styles → Typography → Manage fonts.
 - **Templates:** Appearance → Editor → Templates (or Patterns → Template parts) → open the template
   → ⋮ → Code editor, and paste `backup/single.html` or `backup/footer.html`.
+- **Home and category pages:** open the page in the editor (Pages → Home / Women's Health / Sleep /
+  Nutrition / Wellness) → ⋮ → Code editor, and paste the matching file from `backup/pages/`. The
+  home references the hero image as media ID 88 and the category pages filter by category IDs
+  5–8 (`womens-health`, `sleep`, `nutrition`, `wellness`); if those were recreated with new IDs,
+  update them in the pasted markup.
 - **Reverting to the builder's original:** the same menu has "Reset" for the single template and
   the footer part.
 
