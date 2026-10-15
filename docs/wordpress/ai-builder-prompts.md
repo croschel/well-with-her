@@ -1,5 +1,8 @@
 # WellWithHer → Hostinger AI WordPress builder
 
+> The brand was renamed **HerWellChapter** on 2026-10-15 (see [README.md](README.md)). These are the
+> prompts as sent, under the old name.
+
 Each prompt is under the builder's 2000-character limit. Paste them one at a time, in order.
 
 ---
