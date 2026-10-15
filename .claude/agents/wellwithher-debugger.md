@@ -1,6 +1,8 @@
 ---
 name: wellwithher-debugger
 description: >-
+  Legacy Next.js code only: the live site is now WordPress (use
+  herwellchapter-wordpress for reports about herwellchapter.com).
   Use this agent when a bug report comes in for the WellWithHer site
   (hercozygrowth.com) that has no stack trace and no console output —
   typically from the wife using the live site, describing what she saw

@@ -2,7 +2,8 @@
 
 > **Historical snapshot (2026-09-30).** Kept as the record of the cost comparison. Option B2
 > (this Next.js app on Hostinger managed Node.js) later proved unviable, and the project moved to
-> WordPress on Hostinger instead — see [README.md](README.md).
+> WordPress on Hostinger instead — see [README.md](README.md). The brand was later renamed
+> HerWellChapter and the domain is `herwellchapter.com` (2026-10-15).
 
 Handoff for Claude Code. This summarizes a planning conversation (Sep 30, 2026) about where to host the site and buy the domain. Use it to evaluate the options against the actual repo. Items marked **UNVERIFIED** were not confirmed and need a technical check.
 

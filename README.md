@@ -1,3 +1,7 @@
+> **The live site has moved.** HerWellChapter (formerly WellWithHer) now runs on WordPress at
+> https://herwellchapter.com. This Next.js app is the old version, kept as design and content
+> reference and as a fallback. See [`docs/wordpress/README.md`](docs/wordpress/README.md).
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

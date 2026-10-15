@@ -1,6 +1,7 @@
 ---
 name: seo-auditor
 description: >-
+  Legacy Next.js code only (the live site is now WordPress).
   Use this agent, read-only, before merging any change that touches an
   article page, category page, sitemap.ts, robots.ts, or anything under
   src/constants/seo.ts. It verifies generateMetadata output, canonical

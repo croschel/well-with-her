@@ -1,10 +1,10 @@
-/* WellWithHer: mirrors the original Next.js design */
+/* HerWellChapter: mirrors the original Next.js design */
 .site-header{position:sticky;top:0;z-index:50}
 .admin-bar .site-header{top:32px}
 @media (max-width:782px){.admin-bar .site-header{top:46px}}
 .site-header .hostinger-ai-menu{background:rgba(248,242,234,.93)!important;backdrop-filter:blur(6px);border-bottom:1px solid #d8cdb8}
 .site-header .wp-block-site-title a{display:inline-flex;align-items:center;gap:12px;font-family:var(--wp--preset--font-family--playfairdisplay);font-size:24px;font-weight:500;color:#4a3222;text-decoration:none}
-.site-header .wp-block-site-title a::before{content:"WH";flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid #8a9678;border-radius:50%;font-size:12px;letter-spacing:.5px}
+.site-header .wp-block-site-title a::before{content:"";flex-shrink:0;display:inline-block;width:44px;height:44px;background:url(https://herwellchapter.com/wp-content/uploads/2026/10/herwellchapter-logo-mark-150x150.png) center/contain no-repeat}
 .site-header .wp-block-navigation a{font-family:var(--wp--preset--font-family--jost);font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:#5c4a3a;text-decoration:none;padding-bottom:4px;border-bottom:1px solid transparent}
 .site-header .wp-block-navigation .current-menu-item>a,.site-header .wp-block-navigation a:hover{color:#4a3222;border-bottom-color:#8a9678}
 
@@ -56,7 +56,7 @@
 .wwh-aside-col{position:sticky;top:120px}
 .wwh-aside{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;background:#fffaf3;border:1px solid #e6dcc8;border-radius:12px;padding:26px}
 .wwh-aside>*{margin:0!important}
-.wwh-logo{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border:1px solid #8a9678;border-radius:50%;font-family:var(--wp--preset--font-family--playfairdisplay);font-size:17px;letter-spacing:.5px}
+.wwh-logo{display:inline-block;width:64px;height:64px;background:url(https://herwellchapter.com/wp-content/uploads/2026/10/herwellchapter-logo-mark-150x150.png) center/contain no-repeat;overflow:hidden;text-indent:100%;white-space:nowrap;color:transparent}
 .wwh-aside h2,.wwh-aside h3{font-size:17px;font-weight:600}
 .wwh-aside p{font-size:14px;line-height:1.7;color:#6b5c4a}
 .wwh-aside a{font-size:13px;color:#8a9678;text-decoration:none}
