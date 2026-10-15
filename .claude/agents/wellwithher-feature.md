@@ -1,6 +1,8 @@
 ---
 name: wellwithher-feature
 description: >-
+  Legacy Next.js code only: the live site is now WordPress (use
+  herwellchapter-wordpress for changes to herwellchapter.com).
   Use this agent when the owner asks for a new feature or change to the
   WellWithHer site (hercozygrowth.com) — typically a one-liner like "add
   X" with a few snippets or links. It runs the FRONT half of the ticket
